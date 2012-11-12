@@ -1,6 +1,7 @@
 (ns edn-data-gen.generators-test
   (:use edn-data-gen.generators
-        clojure.test))
+        clojure.test
+        clojure.test.generative))
 
 (deftest ns-str-test
   (testing "namespace generation"
@@ -20,9 +21,5 @@
              (count (re-seq #"\." (namespace sym)))))
         (is (= 1 (count (re-seq #"/" (str sym)))))))))
 
-;; (let [ns-sizers [2 3 4]
-;;           sym-sizer 5
-;;           sym (apply ns-symbol (conj ns-sizers sym-sizer))]
-;;       (is (= (max 0 (dec (count ns-sizers)))
-;;              (count (re-seq #"\." (namespace sym)))))
-;;       (is (= 1 (count (re-seq #"/" (str sym))))))
+;; (defspec lots-of-symbols
+;;   ns-symbol)
