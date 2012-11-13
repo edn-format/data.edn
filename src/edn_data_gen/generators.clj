@@ -2,6 +2,19 @@
   (require [clojure.test.generative.generators :as gen]
            [clojure.string :as string]))
 
+;; (defn get-size
+;;   [sizer]
+;;   (if (fn? sizer)
+;;     (sizer)
+;;     sizer))
+
+(defn call-through
+  "Recursively call x until it doesn't return a function."
+  [x]
+  (if (fn? x)
+    (recur (x))
+    x))
+
 (def default-ns-partitions-sizer
   ^{:doc "Default sizer used to determine the number of partitions a generated namespace will have."}
   #(gen/uniform 1 6))
@@ -20,9 +33,7 @@
   ([]
      (ns-str default-ns-partitions-sizer default-ns-part-length-sizer))
   ([partitions-sizer part-length-sizer]
-     (let [parts (inc (if (fn? partitions-sizer)
-                        (partitions-sizer)
-                        partitions-sizer))]
+     (let [parts (inc (call-through partitions-sizer))]
        (string/join "." (for [_ (range parts)]
                           (gen/symbol part-length-sizer))))))
 
@@ -36,28 +47,59 @@
   ([ns-partitions-sizer part-length-sizer]
      (symbol (ns-str ns-partitions-sizer part-length-sizer) (str (gen/symbol part-length-sizer)))))
 
-(comment
 
-(ns-symbol 5) ;; give me (sizer 5) ns-partions
-;;=> my.name.space.is.super/awesome
+(declare hierarchical-collection)
 
-(ns-symbol 5 8) ;; give me (sizer 5) ns-partions of (sizer 8) length
-;;=> my______.name____.space___.is______.super___/awesome_
+(def collection-specs
+  [[gen/vec 1]
+   [gen/set 1]
+   [gen/hash-map 2]])
+
+(defn mixed-collection
+  [child-fn]
+  (let [[coll-fn arg-count] (rand-nth collection-specs)]
+    (apply coll-fn  (for [_ (range arg-count)] #(child-fn)))))
+
+(def scalar-collection
+  "Returns a random collection of scalar elements."
+  (partial mixed-collection gen/scalar))
+
+(defn hierarchical-anything
+  "Returns a function which returns one of either:
+a scalar-fn
+a coll-fn of scalars e.g. (gen/ven scalar)
+a hierarchical-coll-fn (of partial depth) hierarchcal-anything's
+"
+  [depth]
+  (gen/one-of gen/scalar scalar-collection (partial hierarchical-collection depth)))
+
+(defn hierarchical-collection
+  [depth]
+  (if (pos? depth)
+    (mixed-collection (partial hierarchical-anything (dec depth)))
+    scalar-collection))
 
 
-;; X (ns-symbol 5 4 16) ;; give me (sizer 5) ns-partions of (sizer 8) length
-;;=> my__.name.spac.is__.supr/awesome__________________________
+
+;; (defn hierarchical-coll
+;;   [depth coll-fn]
+;;   (if (pos? depth)
+;;     (partial hierarchical-coll (dec depth))
+;;     ))
+
+;; ;; hierarchical-coll
+;; ;;   vec
+;; ;;     hierarchical-anything
+;; ;;       string
+;; ;;       vec of ... ? mixed
+;; ;;       int
+;; ;;       hiararchical map
 
 
-(ns-symbol-gen [5])
-(ns-symbol-gen [5 8])
-(ns-symbol-gen [5 4 16])
 
-
-
-  (defn ns-symbol [parition-count-sizer parition-length-sizer sym-sizer]
-    "
-ns-parts-sizer: number of
-")
-
-  )
+;; (defn hierarchical-coll
+;;   ([depth-sizer]
+;;      (loop [coll-fn (gen/rand-nth collections) depth (call-through depth-sizer)]
+;;        (if (zero? depth)
+;;          (gen/anything)
+;;          ))))
