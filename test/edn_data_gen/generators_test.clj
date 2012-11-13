@@ -37,21 +37,28 @@
 
 (deftest ns-str-test
   (testing "namespace generation"
-    (doseq [n (range 1 12)]
-      (let [sizers (range 1 n)]
-        (is (= (max 0 (dec (count sizers)))
-               (count (re-seq #"\." (apply ns-str sizers)))))))))
+    (doseq [_ (range 100)]
+      (is (valid-ns? (ns-str))))
+    (doseq [x (range 1 20) y (range 1 40)]
+      (is (valid-ns? (ns-str x y))))))
 
-(deftest ns-symbol-test
-  (testing "namespace qualified symbol generation"
-    (doseq [n (range 1 12)]
-      (let [sizers (range 1 n)
-            ns-sizers (butlast sizers)
-            sym (apply ns-symbol sizers)]
+;; is ns part of symbol valid-ns?
+;; is char after ns a slash
+;; is there only 1 slash
+;; is symbol after slash valid
 
-        (is (= (max 0 (dec (count ns-sizers)))
-             (count (re-seq #"\." (namespace sym)))))
-        (is (= 1 (count (re-seq #"/" (str sym)))))))))
+
+
+;; (deftest ns-symbol-test
+;;   (testing "namespace qualified symbol generation"
+;;     (doseq [n (range 1 12)]
+;;       (let [sizers (range 1 n)
+;;             ns-sizers (butlast sizers)
+;;             sym (apply ns-symbol sizers)]
+
+;;         (is (= (max 0 (dec (count ns-sizers)))
+;;              (count (re-seq #"\." (namespace sym)))))
+;;         (is (= 1 (count (re-seq #"/" (str sym)))))))))
 
 ;; (defspec lots-of-symbols
 ;;   ns-symbol)

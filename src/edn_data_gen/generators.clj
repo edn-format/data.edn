@@ -20,7 +20,9 @@
   ([]
      (ns-str default-ns-partitions-sizer default-ns-part-length-sizer))
   ([partitions-sizer part-length-sizer]
-     (let [parts (inc (partitions-sizer))]
+     (let [parts (inc (if (fn? partitions-sizer)
+                        (partitions-sizer)
+                        partitions-sizer))]
        (string/join "." (for [_ (range parts)]
                           (gen/symbol part-length-sizer))))))
 
