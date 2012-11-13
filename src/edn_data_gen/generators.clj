@@ -48,7 +48,6 @@
      (symbol (ns-str ns-partitions-sizer part-length-sizer) (str (gen/symbol part-length-sizer)))))
 
 
-(declare hierarchical-collection)
 
 (def collection-specs
   [[gen/vec 1]
@@ -64,6 +63,8 @@
   "Returns a random collection of scalar elements."
   (partial mixed-collection gen/scalar))
 
+(declare hierarchical-collection)
+
 (defn hierarchical-anything
   "Returns a function which returns one of either:
 a scalar-fn
@@ -78,28 +79,3 @@ a hierarchical-coll-fn (of partial depth) hierarchcal-anything's
   (if (pos? depth)
     (mixed-collection (partial hierarchical-anything (dec depth)))
     scalar-collection))
-
-
-
-;; (defn hierarchical-coll
-;;   [depth coll-fn]
-;;   (if (pos? depth)
-;;     (partial hierarchical-coll (dec depth))
-;;     ))
-
-;; ;; hierarchical-coll
-;; ;;   vec
-;; ;;     hierarchical-anything
-;; ;;       string
-;; ;;       vec of ... ? mixed
-;; ;;       int
-;; ;;       hiararchical map
-
-
-
-;; (defn hierarchical-coll
-;;   ([depth-sizer]
-;;      (loop [coll-fn (gen/rand-nth collections) depth (call-through depth-sizer)]
-;;        (if (zero? depth)
-;;          (gen/anything)
-;;          ))))

@@ -60,5 +60,33 @@
 ;;              (count (re-seq #"\." (namespace sym)))))
 ;;         (is (= 1 (count (re-seq #"/" (str sym)))))))))
 
-;; (defspec lots-of-symbols
-;;   ns-symbol)
+(defn scalar?
+  [x]
+  (not (coll? x)))
+
+(defn scalar-coll?
+  [coll]
+  (let [vs (if (map? coll)
+             (concat (keys coll) (vals coll))
+             coll)]
+    (not (some coll? vs))))
+
+
+(defn depth-count
+  ([data]
+     (depth-count 0 data))
+  ([depth data]
+     (if (or (scalar? data)
+             (scalar-coll? data))
+       depth
+       (let [vs (if (map? data)
+                  (concat (keys data) (vals data))
+                  data)]
+         (apply max (map (partial depth-count (inc depth)) vs))))))
+
+(deftest hierarchical-anything-test
+  (testing "hierarchical anything generation"
+    (doseq [depth (range 3)
+            _ (range 15)]
+      (is (>= depth
+             (depth-count (hierarchical-anything depth)))))))
