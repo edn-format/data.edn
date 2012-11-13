@@ -1,7 +1,39 @@
 (ns edn-data-gen.generators-test
   (:use edn-data-gen.generators
-        clojure.test
-        clojure.test.generative))
+        clojure.test)
+  (:require [clojure.test.generative.generators :as gen]))
+
+
+(def symbol-start-chars
+  (set (map char @#'gen/symbol-start)))
+
+(def symbol-chars
+  (set (map char @#'gen/symbol-char)))
+
+(def ns-symbol-chars
+  (conj symbol-chars \.))
+
+(defn valid-ns-start?
+  [s]
+  (contains? symbol-start-chars
+             (first s)))
+
+(defn all-valid-ns-chars?
+  [s]
+  (not (some #(not (contains? ns-symbol-chars %))
+             s)))
+
+(defn valid-ns-dot-positions?
+  [s]
+  (not (or
+        (.contains s "..")
+        (.endsWith s "."))))
+
+(defn valid-ns?
+  [s]
+  (and (valid-ns-start? s)
+       (all-valid-ns-chars? s)
+       (valid-ns-dot-positions? s)))
 
 (deftest ns-str-test
   (testing "namespace generation"
