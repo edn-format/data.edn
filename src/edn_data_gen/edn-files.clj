@@ -19,18 +19,24 @@
 
 (defn file-of-ints
   ([n]
-     (file-of-ints n "out.edn"))
+     (file-of-ints n "ints.edn"))
   ([n filename]
      (write-edn (repeatedly n gen/int) filename)))
 
 (defn file-of-floats
   ([n]
-     (file-of-floats n "out.edn"))
+     (file-of-floats n "floats.edn"))
   ([n filename]
      (write-edn (repeatedly n gen/float) filename)))
 
 (defn file-of-numbers
   ([n]
-     (file-of-numbers n "out.edn"))
+     (file-of-numbers n "numbers.edn"))
   ([n filename]
      (write-edn (repeatedly n (fn [] ((rand-nth num-gens)))) filename)))
+
+(defn file-of-keywords
+  ([n]
+     (file-of-keywords n "keywords.edn"))
+  ([n filename]
+     (write-edn (repeatedly n gen/keyword) filename)))
