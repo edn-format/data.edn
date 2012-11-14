@@ -19,13 +19,13 @@
 
 (defn file-of-ints
   ([n]
-     (file-of-numbers n "out.edn"))
+     (file-of-ints n "out.edn"))
   ([n filename]
      (write-edn (repeatedly n gen/int) filename)))
 
 (defn file-of-floats
   ([n]
-     (file-of-numbers n "out.edn"))
+     (file-of-floats n "out.edn"))
   ([n filename]
      (write-edn (repeatedly n gen/float) filename)))
 
