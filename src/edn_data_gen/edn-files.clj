@@ -17,6 +17,20 @@
    gen/float
    gen/double])
 
+(defn file-of-ints
+  ([n]
+     (file-of-numbers n "out.edn"))
+  ([n filename]
+     (write-edn (repeatedly n gen/int) filename)))
+
+(defn file-of-floats
+  ([n]
+     (file-of-numbers n "out.edn"))
+  ([n filename]
+     (write-edn (repeatedly n gen/float) filename)))
+
 (defn file-of-numbers
+  ([n]
+     (file-of-numbers n "out.edn"))
   ([n filename]
      (write-edn (repeatedly n (fn [] ((rand-nth num-gens)))) filename)))
