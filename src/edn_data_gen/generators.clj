@@ -2,12 +2,6 @@
   (require [clojure.test.generative.generators :as gen]
            [clojure.string :as string]))
 
-;; (defn get-size
-;;   [sizer]
-;;   (if (fn? sizer)
-;;     (sizer)
-;;     sizer))
-
 (defn call-through
   "Recursively call x until it doesn't return a function."
   [x]
@@ -47,7 +41,24 @@
   ([ns-partitions-sizer part-length-sizer]
      (symbol (ns-str ns-partitions-sizer part-length-sizer) (str (gen/symbol part-length-sizer)))))
 
+(defn any-symbol
+  []
+  (gen/one-of gen/symbol ns-symbol))
 
+(defn any-keyword
+  []
+  (keyword (any-symbol)))
+
+(defn ns-keyword
+  []
+  (keyword (ns-symbol)))
+
+;; TODO: this fn should be moved to the edn-data-gen/print namespace when it exists
+(defn keyword->tag-str
+  [k]
+  (if-let [ns (namespace k)]
+    (str "#" ns "/" (name k))
+    (str "#" (name k))))
 
 (def collection-specs
   [[gen/vec 1]
@@ -63,19 +74,38 @@
   "Returns a random collection of scalar elements."
   (partial mixed-collection gen/scalar))
 
-(declare hierarchical-collection)
+(declare hierarchical-anything)
+
+(def default-hierarchy-sizer
+  ^{:doc "Default sizer used to determine the depth a generated hierarchy will have."}
+  #(gen/uniform 1 4))
+
+(defn hierarchical-collection
+  ([] (hierarchical-collection (default-hierarchy-sizer)))
+  ([depth]
+     (if (pos? depth)
+       (mixed-collection (partial hierarchical-anything (dec depth)))
+       scalar-collection)))
+
+(def default-anything-sizer
+  ^{:doc "Default sizer used to determine the depth a generated hierarchy will have."}
+  #(gen/uniform 0 4))
 
 (defn hierarchical-anything
   "Returns a function which returns one of either:
 a scalar-fn
 a coll-fn of scalars e.g. (gen/ven scalar)
-a hierarchical-coll-fn (of partial depth) hierarchcal-anything's
-"
-  [depth]
-  (gen/one-of gen/scalar scalar-collection (partial hierarchical-collection depth)))
+a hierarchical-coll-fn (of partial depth) hierarchcal-anything's"
+  ([] (hierarchical-anything (default-anything-sizer)))
+  ([depth]
+     (if (pos? depth)
+       (gen/one-of gen/scalar scalar-collection (partial hierarchical-collection depth))
+       (gen/scalar))))
 
-(defn hierarchical-collection
-  [depth]
-  (if (pos? depth)
-    (mixed-collection (partial hierarchical-anything (dec depth)))
-    scalar-collection))
+;; (defn hierarchical-anything
+;;   "Returns a function which returns one of either:
+;; a scalar-fn
+;; a coll-fn of scalars e.g. (gen/ven scalar)
+;; a hierarchical-coll-fn (of partial depth) hierarchcal-anything's"
+;;   [depth]
+;;   (gen/one-of gen/scalar scalar-collection (partial hierarchical-collection depth)))
