@@ -2,7 +2,7 @@
   (require [clojure.test.generative.generators :as gen]
            [clojure.string :as string]
            [clojure.java.io :as io]
-           [edn-data-gen.generators :as edngen]))
+           [edn-data-gen.generators :as edn-gen]))
 
 (defn- file-exists?
   "returns a bool indicating whether a dir or file exists"
@@ -90,4 +90,4 @@
   ([n]
      (file-of-keywords (out-path "keywords.edn") n))
   ([filename n]
-     (write-edn filename (repeatedly n gen/keyword))))
+     (write-edn filename (repeatedly n edn-gen/any-keyword))))
