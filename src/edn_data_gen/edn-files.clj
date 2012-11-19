@@ -113,6 +113,12 @@
   ([filename n]
      (write-edn filename (repeatedly n edn-gen/any-keyword))))
 
+(defn file-of-hierarchical-anything
+  ([n]
+     (file-of-hierarchical-anything (out-path "hierarchical.edn") n))
+  ([filename n]
+     (write-edn filename (repeatedly n edn-gen/hierarchical-anything))))
+
 (comment
   ;;Would be nice to write these composably.
   (-> ())
