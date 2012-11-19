@@ -5,20 +5,23 @@
            [edn-data-gen.generators :as edn-gen]
            [clojure.pprint :as pprint]))
 
+
+
 (defn pr-edn
   [data]
-  (binding [*print-dup* true]
-    (with-out-str (pr data))))
+  (with-out-str (pr data)))
 
 (defn prn-edn
   [data]
-  (binding [*print-dup* true]
-    (with-out-str (prn data))))
+  (with-out-str (prn data)))
 
 (defn pprint-edn
   [data]
-  (binding [*print-dup* true]
-    (with-out-str (pprint/pprint data))))
+  (with-out-str (pprint/pprint data)))
+
+(defn print-edn-forms
+  [printer delimiter forms]
+  (string/join delimiter (map printer forms)))
 
 (defn- file-exists?
   "returns a bool indicating whether a dir or file exists"
@@ -69,26 +72,25 @@
        filename))
 
 (defn write-edn
-  "Prints out an data structure in end format to a file."
-  ([data]
-     (write-edn (out-path "out.edn") data))
-  ([filename data]
-     (binding [*print-dup* true]
-       (ensure-parent-directory! filename)
-       (spit (str filename)
-             (with-out-str (prn data))))))
+  "Prints out an data structure in edn format to a file."
+  [printer filename data]
+  (ensure-parent-directory! filename)
+  (spit (str filename)
+        (printer data)))
 
-(defn pprint-edn
-  "Pretty prints out an data structure in end format to a file."
-  ([data]
-     (pprint-edn (out-path "pretty.edn") data))
-  ([filename data]
-     (binding [*print-dup* true]
-       (ensure-parent-directory! filename)
-       (spit (str filename)
-             (with-out-str (pprint/pprint data))))))
+(defn write-edn-forms
+  "Prints out an data structure in edn format to a file."
+  [printer delimiter filename data]
+  (ensure-parent-directory! filename)
+  (spit (str filename)
+        (print-edn-forms printer delimiter data)))
+
+(defn file-of
+  [generator filename sizer]
+  )
 
 
+;; (gen/list gen/int)
 (defn file-of-ints
   ([n]
      (file-of-ints (out-path "ints.edn") n))
