@@ -2,7 +2,23 @@
   (require [clojure.test.generative.generators :as gen]
            [clojure.string :as string]
            [clojure.java.io :as io]
-           [edn-data-gen.generators :as edn-gen]))
+           [edn-data-gen.generators :as edn-gen]
+           [clojure.pprint :as pprint]))
+
+(defn pr-edn
+  [data]
+  (binding [*print-dup* true]
+    (with-out-str (pr data))))
+
+(defn prn-edn
+  [data]
+  (binding [*print-dup* true]
+    (with-out-str (prn data))))
+
+(defn pprint-edn
+  [data]
+  (binding [*print-dup* true]
+    (with-out-str (pprint/pprint data))))
 
 (defn- file-exists?
   "returns a bool indicating whether a dir or file exists"
@@ -62,11 +78,16 @@
        (spit (str filename)
              (with-out-str (prn data))))))
 
-(def num-gens
-  [gen/int
-   gen/long
-   gen/float
-   gen/double])
+(defn pprint-edn
+  "Pretty prints out an data structure in end format to a file."
+  ([data]
+     (pprint-edn (out-path "pretty.edn") data))
+  ([filename data]
+     (binding [*print-dup* true]
+       (ensure-parent-directory! filename)
+       (spit (str filename)
+             (with-out-str (pprint/pprint data))))))
+
 
 (defn file-of-ints
   ([n]
@@ -84,10 +105,22 @@
   ([n]
      (file-of-numbers (out-path "numbers.edn") n))
   ([filename n]
-     (write-edn filename (repeatedly n (fn [] ((rand-nth num-gens)))))))
+     (write-edn filename (repeatedly n edn-gen/numbers))))
 
 (defn file-of-keywords
   ([n]
      (file-of-keywords (out-path "keywords.edn") n))
   ([filename n]
      (write-edn filename (repeatedly n edn-gen/any-keyword))))
+
+(comment
+  ;;Would be nice to write these composably.
+  (-> ())
+  ;; what is the interface for an edn writer:
+  ;; an edn printer outputs a string.
+  ;; an edn writer uses an edn printer to create a string of the data and writes it to file
+  ;; print-edn takes any data structure and outputs edn
+  ;; print-edn-forms takes a sequence of edn forms and apply print-edn to the seq
+
+
+  )

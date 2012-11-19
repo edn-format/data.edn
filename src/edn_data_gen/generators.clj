@@ -9,6 +9,16 @@
     (recur (x))
     x))
 
+(def num-gens
+  [gen/int
+   gen/long
+   gen/float
+   gen/double])
+
+(defn numbers
+  []
+  (fn [] ((rand-nth num-gens))))
+
 (def default-ns-partitions-sizer
   ^{:doc "Default sizer used to determine the number of partitions a generated namespace will have."}
   #(gen/uniform 1 6))
