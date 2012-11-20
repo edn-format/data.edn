@@ -1,27 +1,41 @@
 (ns edn-data-gen.printers
-  "Short package description."
+  "a basic edn printer"
   (:require [edn-data-gen.protocols.print :as print]))
 
 ;; (.write ^Writer *out* "#")
 
 (defn pr-sequential-writer
-  [coll edn-printer begin separator end]
-  (print-edn edn-printer begin)
+  [edn-printer coll begin end]
+  (print/edn-write edn-printer begin)
   (when (seq coll)
-    (print/print-edn (first coll) edn-printer))
+    (print/print-edn-data (first coll) edn-printer))
   (doseq [o (next coll)]
-    (print separator)
-    (print/print-edn o edn-printer))
-  (print end))
+    (print/print-separated-edn edn-printer nil nil)
+    (print/print-edn-data o edn-printer))
+  (print/edn-write edn-printer end))
 
-(extend-protocol print/IEDNPrintable
-  clojure.lang.PersistentVector
-  (print-edn [this edn-printer]
-    (pr-sequential-writer "["
-                          " "
-                          "]"
-                          this))
-  clojure.lang.IPersistentCollection
-  (print-edn [this edn-printer] )
-  java.lang.Object
-  (print-edn [this edn-printer] (pr this)))
+(deftype SingleSpaceInjectingEDNPrinter [writer]
+  print/IEDNPrinter
+  (print-edn-collection [this coll begin end]
+    (pr-sequential-writer this coll begin end))
+  (print-separated-edn [this prev next]
+    (print/edn-write this " "))
+  (print-edn [this x]
+    (print/edn-write this (str x)))
+  (edn-write [this s]
+    (.write writer s)))
+
+
+(comment
+
+  (import '[edn_data_gen.printers SingleSpaceInjectingEDNPrinter])
+  (require '[edn-data-gen.printable :as printable])
+  (require '[edn-data-gen.protocols.print :as edn-print])
+  (edn-print/print-edn-data [1 2 3] (SingleSpaceInjectingEDNPrinter. *out*))
+  ;;=> [1 2 3]
+  (edn-print/print-edn-data #{1 2 3} (SingleSpaceInjectingEDNPrinter. *out*))
+  ;;=> #{1 2 3}
+  (edn-print/print-edn-data {:a 1 :b 2} (SingleSpaceInjectingEDNPrinter. *out*))
+  ;;=>{[:a 1] [:b 2]}
+  ;;   ^ wrong!
+  )

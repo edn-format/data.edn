@@ -1,22 +1,26 @@
 (ns edn-data-gen.printable
-  "DIE")
-
-
-(defn pr-sequential-writer
-  [coll writer begin separator end]
-  (write writer begin)
-  (when (seq coll)
-    (print/print-edn (first coll) writer))
-  (doseq [o (next coll)]
-    (write writer separator)
-    (print/print-edn o writer))
-  (write writer end))
-
+  "Extending the IEDNPrintable protocol to base types"
+  (:require [edn-data-gen.protocols.print :as print]))
 
 (extend-protocol print/IEDNPrintable
-  vector
-  (print-edn [this writer]
-    (pr-sequential-writer this writer
-                          "["
-                          " "
-                          "]"))
+  clojure.lang.PersistentVector
+  (print-edn-data [this edn-printer]
+    (print/print-edn-collection edn-printer this "[" "]"))
+  clojure.lang.IPersistentMap
+  (print-edn-data [this edn-printer]
+    (print/print-edn-collection edn-printer this "{" "}"))
+  clojure.lang.IPersistentSet
+  (print-edn-data [this edn-printer]
+    (print/print-edn-collection edn-printer this "#{" "}"))
+  clojure.lang.IPersistentList
+  (print-edn-data [this edn-printer]
+    (print/print-edn-collection edn-printer this "(" ")"))
+  java.lang.Object
+  (print-edn-data [this edn-printer]
+    (print/print-edn edn-printer this)))
+
+(extend-protocol print/IEDNPrintSeparable
+  clojure.lang.IPersistentMap
+  (print-edn-separator [this edn-printer] ",")
+  clojure.lang.IPersistentSet
+  (print-edn-separator [this edn-printer] ","))
