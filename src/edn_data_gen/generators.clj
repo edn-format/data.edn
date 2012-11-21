@@ -1,6 +1,8 @@
 (ns edn-data-gen.generators
   (:require [clojure.test.generative.generators :as gen]
-            [clojure.string :as string]))
+            [edn-data-gen.print.protocols.printable :as printable]
+            [clojure.string :as string]
+            [edn-data-gen.print.writers.io-writer :as io-writer]))
 
 (defn call-through
   "Recursively call x until it doesn't return a function."
@@ -168,3 +170,13 @@ a hierarchical-coll-fn (of partial depth) hierarchcal-anything's"
 ;; a hierarchical-coll-fn (of partial depth) hierarchcal-anything's"
 ;;   [depth]
 ;;   (gen/one-of gen/scalar scalar-collection (partial hierarchical-collection depth)))
+
+(defn edn-str
+  [generator opts]
+  (let [sw (java.io.StringWriter.)]
+    (printable/print (generator) sw opts)
+    (str sw)))
+
+(defn edn-file
+  [generator filewriter opts]
+  (printable/print (generator) filewriter opts))
