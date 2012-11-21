@@ -1,6 +1,6 @@
 (ns edn-data-gen.generators
-  (require [clojure.test.generative.generators :as gen]
-           [clojure.string :as string]))
+  (:require [clojure.test.generative.generators :as gen]
+            [clojure.string :as string]))
 
 (defn call-through
   "Recursively call x until it doesn't return a function."
@@ -69,6 +69,55 @@
   (if-let [ns (namespace k)]
     (str "#" ns "/" (name k))
     (str "#" (name k))))
+
+(def whitespace-chars
+  [\newline \tab \formfeed \return \space])
+
+(def edn-whitespace-chars
+  (conj whitespace-chars \,))
+
+(defn whitespace-str
+  ([]
+     (whitespace-str gen/default-sizer))
+  ([sizer]
+     (gen/string #(char (rand-nth whitespace-chars)) sizer)))
+
+(def default-whitespace-sizer
+  (rescaled-geometric 5))
+
+(defn weighted-whitespace-str
+  ([]
+     (weighted-whitespace-str default-whitespace-sizer))
+  ([sizer]
+     (gen/string (fn [] (gen/weighted {\space 20
+                                       \newline 5
+                                       #(char (rand-nth whitespace-chars)) 1}))
+                 sizer)))
+
+(defn edn-whitespace-str
+  ([]
+     (edn-whitespace-str gen/default-sizer))
+  ([sizer]
+     (gen/string #(char (rand-nth edn-whitespace-chars)) sizer)))
+
+(defn comment-str
+  []
+  "Generate a semicolon, single-line string, and a newline"
+  (str ";" (gen/string) "\n"))
+
+(defn comment-line
+  []
+  "A comment-line can start with any amount of whitespace.
+Before any non-whitespace characters must contain a semicolon.
+Must end in a newline."
+  (str (weighted-whitespace-str) (comment-str)))
+
+(def default-comment-block-sizer
+  (rescaled-geometric 2))
+
+(defn comment-block
+  []
+  (gen/string comment-line default-comment-block-sizer))
 
 (def collection-specs
   [[gen/vec 1]
