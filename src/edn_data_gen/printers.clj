@@ -31,6 +31,7 @@
   (import '[edn_data_gen.printers SingleSpaceInjectingEDNPrinter])
   (require '[edn-data-gen.printable :as printable])
   (require '[edn-data-gen.protocols.print :as edn-print])
+  (defn p [d] (edn-print/print-edn-data d (SingleSpaceInjectingEDNPrinter. *out*)))
   (edn-print/print-edn-data [1 2 3] (SingleSpaceInjectingEDNPrinter. *out*))
   ;;=> [1 2 3]
   (edn-print/print-edn-data #{1 2 3} (SingleSpaceInjectingEDNPrinter. *out*))

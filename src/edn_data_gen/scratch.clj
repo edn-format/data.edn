@@ -61,3 +61,12 @@
 
 
   )
+
+
+(let [v [1 2]]
+  (when-not (empty? v)
+    (loop [[a b :as vs] v]
+          (if-let [nvs (next vs)]
+                  (do (printf "%s, " a)
+                      (recur nvs))
+                  (printf "%s" a)))))

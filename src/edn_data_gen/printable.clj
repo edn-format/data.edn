@@ -2,6 +2,17 @@
   "Extending the IEDNPrintable protocol to base types"
   (:require [edn-data-gen.protocols.print :as print]))
 
+(def
+  char-escape-string
+    {\newline "\\n"
+     \tab  "\\t"
+     \return "\\r"
+     \" "\\\""
+     \\  "\\\\"
+     \formfeed "\\f"
+     \backspace "\\b"})
+
+
 (extend-protocol print/IEDNPrintable
   clojure.lang.PersistentVector
   (print-edn-data [this edn-printer]
@@ -21,6 +32,14 @@
       (print/print-edn-data k edn-printer)
       (print/print-separated-edn edn-printer)
       (print/print-edn-data v edn-printer)))
+  java.lang.String
+  (print-edn-data [this edn-printer]
+    (print/edn-write edn-printer "\"")
+    (dotimes [n (count this)]
+      (let [c (.charAt this n)
+            e (char-escape-string c)]
+        (print/edn-write edn-printer (if e e (str c)))))
+    (print/edn-write edn-printer "\""))
   java.lang.Object
   (print-edn-data [this edn-printer]
     (print/print-edn edn-printer this)))
