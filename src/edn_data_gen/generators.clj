@@ -142,11 +142,12 @@ Must end in a newline."
   #(gen/uniform 1 4))
 
 (defn hierarchical-collection
-  ([] (hierarchical-collection (default-hierarchy-sizer)))
-  ([depth]
-     (if (pos? depth)
-       (mixed-collection (partial hierarchical-anything (dec depth)))
-       scalar-collection)))
+  ([] (hierarchical-collection default-hierarchy-sizer))
+  ([depth-sizer]
+     (let [depth (call-through depth-sizer)]
+       (if (pos? depth)
+         (mixed-collection (partial hierarchical-anything (dec depth)))
+         scalar-collection))))
 
 (def default-anything-sizer
   ^{:doc "Default sizer used to determine the depth a generated hierarchy will have."}
@@ -157,11 +158,12 @@ Must end in a newline."
 a scalar-fn
 a coll-fn of scalars e.g. (gen/ven scalar)
 a hierarchical-coll-fn (of partial depth) hierarchcal-anything's"
-  ([] (hierarchical-anything (default-anything-sizer)))
-  ([depth]
-     (if (pos? depth)
-       (gen/one-of gen/scalar scalar-collection (partial hierarchical-collection depth))
-       (gen/scalar))))
+  ([] (hierarchical-anything default-anything-sizer))
+  ([depth-sizer]
+     (let [depth (call-through depth-sizer)]
+       (if (pos? depth)
+         (gen/one-of gen/scalar scalar-collection (partial hierarchical-collection depth))
+         (gen/scalar)))))
 
 ;; (defn hierarchical-anything
 ;;   "Returns a function which returns one of either:
@@ -177,6 +179,6 @@ a hierarchical-coll-fn (of partial depth) hierarchcal-anything's"
     (printable/print (generator) sw opts)
     (str sw)))
 
-(defn edn-file
-  [generator filewriter opts]
-  (printable/print (generator) filewriter opts))
+;; (defn edn-file
+;;   [generator filewriter opts]
+;;   (printable/print (generator) filewriter opts))
