@@ -7,7 +7,8 @@
             [edn-data-gen.files.helpers :as files]
             [edn-data-gen.print.protocols.printable :as printable]
             [edn-data-gen.print.writers.io-writer :as io-writer]
-            [edn-data-gen.printables.comment-injection :as c-inj]
+            ;;[edn-data-gen.printables.comment-injection :as c-inj]
+            [edn-data-gen.printables.injection :as injection]
             [edn-data-gen.print.helpers :as print-helpers]))
 
 
@@ -66,7 +67,7 @@ Creates a file with those things at top level."
 
 (defn file-of-many
   "Take a generator which makes a single thing.
-Creates a file with many of those generated things at top level."
+Creates a file with many of those gener]ated things at top level."
   ([generator file-path opts]
      (file-of-forms (partial gen/list generator) file-path opts))
   ([generator sizer file-path opts]
@@ -131,7 +132,8 @@ Creates a file with many of those generated things at top level."
   (do-file-gen (partial file-of-many gen/int 50) (partial typed-file-path (out-dir "ints_50") :int) 5 {:form-separator "\n"})
   (do-file-gen (partial file-of edn-gen/hierarchical-collection) (partial typed-file-path (out-dir "hierarchy_comments_50") :hierarachy-comments) 50 {:generator/comment edn-gen/comment-block})
 
-
+  (file-of #(gen/list gen/int 100) (out-path "ints.edn") {:generator/tag (edn-gen/occasional edn-gen/ns-keyword 20)})
+  (def _ (file-of #(gen/list gen/int 100) (out-path "ints.edn") {:generator/discard (edn-gen/occasional edn-gen/scalar 20)}))
 
   {:file-generator :file-of-many ;; file-of-forms, file-of
    :data-generator gen/int

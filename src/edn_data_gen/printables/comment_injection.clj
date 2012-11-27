@@ -42,6 +42,13 @@
                               (separator-with-comment " " opts)
                               ")"))
 
+  clojure.lang.LazySeq
+  (print [this w opts]
+    (helpers/print-sequential this w opts
+                              "("
+                              (separator-with-comment " " opts)
+                              ")"))
+
   java.lang.String
   (print [this w opts]
     (helpers/write-string this w))

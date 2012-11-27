@@ -8,7 +8,9 @@
 
 (defn test-file-of
   ([generator n]
-     (doseq [out (files/file-gen (partial files/file-of generator) files/file-path n {})]
+     (test-file-of generator n {}))
+  ([generator n opts]
+     (doseq [out (files/file-gen (partial files/file-of generator) files/file-path n opts)]
        (let [read-data (with-open [r (io/reader (out :path))]
                          (read (java.io.PushbackReader. r)))]
          (if (= read-data
@@ -26,4 +28,6 @@
   (test-file-of (partial gen/vec edn-gen/float) 10)
   (test-file-of (partial gen/vec gen/string) 10)
   (test-file-of (partial gen/vec gen/keyword) 10)
-  (test-file-of edn-gen/hierarchical-anything 10))
+  (test-file-of edn-gen/hierarchical-anything 10)
+  (test-file-of edn-gen/hierarchical-anything 10 {:generator/comment edn-gen/comment-block})
+  )

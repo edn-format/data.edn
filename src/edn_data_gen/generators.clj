@@ -91,14 +91,18 @@
   (keyword (ns-symbol)))
 
 ;; TODO: this fn should be moved to the edn-data-gen/print namespace when it exists
-(defn keyword->tag-str
-  [k]
-  (if-let [ns (namespace k)]
-    (str "#" ns "/" (name k))
-    (str "#" (name k))))
+;; (defn keyword->tag-str
+;;   [k]
+;;   (if-let [ns (namespace k)]
+;;     (str "#" ns "/" (name k))
+;;     (str "#" (name k))))
+
+;; (defn tag
+;;   []
+;;   (keyword->tag-str (ns-keyword)))
 
 (def whitespace-chars
-  [\newline \tab \formfeed \return \space])
+  [\newline \tab \return \space])
 
 (def edn-whitespace-chars
   (conj whitespace-chars \,))
@@ -174,11 +178,15 @@ Must end in a newline."
   #(gen/uniform 1 3))
 
 (defn hierarchical-collection
-  ([] (hierarchical-collection default-hierarchy-depth-sizer))
+  ([]
+     (hierarchical-collection default-hierarchy-depth-sizer default-collection-sizer))
   ([depth-sizer]
+     (hierarchical-collection depth-sizer default-collection-sizer))
+  ([depth-sizer count-sizer]
      (let [depth (call-through depth-sizer)]
        (if (pos? depth)
-         (mixed-collection (partial hierarchical-anything (dec depth)))
+         (mixed-collection (partial hierarchical-anything (dec depth) count-sizer)
+                           count-sizer)
          scalar-collection))))
 
 (def default-anything-depth-sizer
@@ -190,11 +198,16 @@ Must end in a newline."
 a scalar-fn
 a coll-fn of scalars e.g. (gen/ven scalar)
 a hierarchical-coll-fn (of partial depth) hierarchcal-anything's"
-  ([] (hierarchical-anything default-anything-depth-sizer))
+  ([]
+     (hierarchical-anything default-anything-depth-sizer default-collection-sizer))
   ([depth-sizer]
+     (hierarchical-anything depth-sizer default-collection-sizer))
+  ([depth-sizer count-sizer]
      (let [depth (call-through depth-sizer)]
        (if (pos? depth)
-         (gen/one-of gen/scalar scalar-collection (partial hierarchical-collection depth))
+         (gen/one-of gen/scalar
+                     (partial scalar-collection count-sizer)
+                     (partial hierarchical-collection depth count-sizer))
          (gen/scalar)))))
 
 ;; (defn hierarchical-anything
@@ -214,3 +227,9 @@ a hierarchical-coll-fn (of partial depth) hierarchcal-anything's"
 ;; (defn edn-file
 ;;   [generator filewriter opts]
 ;;   (printable/print (generator) filewriter opts))
+
+
+(defn occasional
+  [generator probability]
+  #(gen/weighted {nil (- 100 probability)
+                  generator probability}))
