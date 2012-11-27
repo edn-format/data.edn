@@ -36,39 +36,41 @@
     (printable/print data f opts)))
 
 (defn edn-forms-file
-  [coll filewriter opts separator]
+  [coll filewriter opts]
   (with-open [f filewriter]
-    (print-helpers/print-seq-contents coll f opts separator)))
+    (print-helpers/print-seq-contents coll f opts (:form-separator opts))))
 
 (defn file-of
-  ([generator file-path]
+  ([generator file-path opts]
      (files/ensure-parent-directory! file-path)
      (let [writer (io/writer file-path)
            data (generator)
-           _ (edn-file data writer {})]
+           _ (edn-file data writer opts)]
        data))
-  ([generator sizer file-path]
-     (file-of (partial generator sizer) file-path)))
+  ([generator sizer file-path opts]
+     (file-of (partial generator sizer) file-path opts)))
 
 (defn file-of-forms
   "Takes a generator which makes multiple things.
 Creates a file with those things at top level."
-  ([generator file-path]
+  ([generator file-path opts]
      (files/ensure-parent-directory! file-path)
      (let [writer (io/writer file-path)
            data (generator)
-           _ (edn-forms-file data writer {} " ")]
+           sep (:form-separator opts)
+           opts (if sep opts (assoc opts :form-separator " "))
+           _ (edn-forms-file data writer opts)]
        data))
-  ([generator sizer file-path]
-     (file-of-forms (partial generator sizer) file-path)))
+  ([generator sizer file-path opts]
+     (file-of-forms (partial generator sizer) file-path opts)))
 
 (defn file-of-many
   "Take a generator which makes a single thing.
 Creates a file with many of those generated things at top level."
-  ([generator file-path]
-     (file-of-forms (partial gen/list generator) file-path))
-  ([generator sizer file-path]
-     (file-of-forms (partial gen/list generator sizer) file-path)))
+  ([generator file-path opts]
+     (file-of-forms (partial gen/list generator) file-path opts))
+  ([generator sizer file-path opts]
+     (file-of-forms (partial gen/list generator sizer) file-path opts)))
 
 (defn file-name
   []
@@ -102,27 +104,33 @@ Creates a file with many of those generated things at top level."
 
 (defn file-gen
   "Using a generator thunk, creates n files of generated data using file-path-gen"
-  [file-generator file-path-gen n]
+  [file-generator file-path-gen n opts]
   (for [_ (range n)]
     (let [path (file-path-gen)
-          data (file-generator path)]
+          data (file-generator path opts)]
       {:path path
        :data data})))
 
+(defn do-file-gen
+  [& params]
+  (dorun (apply file-gen params)))
 
 (comment
-  (file-of-many gen/int 100 (out-path "ints.edn"))
-  (file-of-many gen/float 100 (out-path "floats.edn"))
-  (file-of-many edn-gen/numbers 100 (out-path "numbers.edn"))
-  (file-of-many edn-gen/any-keyword 100 (out-path "keywords.edn"))
-  (file-of-many edn-gen/hierarchical-anything 100 (out-path "hierarchical.edn"))
+  (file-of-many gen/int 100 (out-path "ints.edn") {})
+  (file-of-many gen/float 100 (out-path "floats.edn") {})
+  (file-of-many edn-gen/numbers 100 (out-path "numbers.edn") {})
+  (file-of-many edn-gen/any-keyword 100 (out-path "keywords.edn") {})
+  (file-of-many edn-gen/hierarchical-anything 100 (out-path "hierarchical.edn") {})
 
-  (files-of-type :int (partial file-of-many gen/int) 10 (out-dir "ints01"))
-  (files-of-type :hierarachy (partial file-of edn-gen/hierarchical-anything) 2 (out-dir "hierarchy01"))
-  (files-of-type :hierarachy (partial file-of-many edn-gen/hierarchical-anything 2) 2 (out-dir "hierarchy01"))
+  (do-file-gen (partial file-of-many gen/int 50) (partial typed-file-path (out-dir "ints_50") :int) 5 {})
 
+  (file-of-many gen/int 100 (out-path "ints.edn") {:form-separator edn-gen/comment-block})
+  (file-of-many gen/int 100 (out-path "ints.edn") {})
+  (file-of-many gen/int 100 (out-path "ints.edn") {:form-separator "\n"})
 
-  (file-gen (partial file-of-many gen/int 50) (partial typed-file-path (out-dir "ints_50") :int) 5)
+  (do-file-gen (partial file-of-many gen/int 50) (partial typed-file-path (out-dir "ints_50") :int) 5 {:form-separator "\n"})
+  (do-file-gen (partial file-of edn-gen/hierarchical-collection) (partial typed-file-path (out-dir "hierarchy_comments_50") :hierarachy-comments) 50 {:generator/comment edn-gen/comment-block})
+
 
 
   {:file-generator :file-of-many ;; file-of-forms, file-of

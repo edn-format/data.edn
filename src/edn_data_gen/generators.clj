@@ -11,15 +11,40 @@
     (recur (x))
     x))
 
+(defn normal
+  "Quick and dirty normal distribution around a mean based on java.util.Randon nextGaussian"
+  [mean]
+  (let [rndm (.nextGaussian (java.util.Random.))
+        result (Math/round (+ mean
+                              (* rndm (/ mean 5))))]
+    (if (and (<= result (* 2 mean))
+             (>= result 0))
+      result
+      (recur mean))))
+
+(def not-yet-valid-edn-doubles
+  #{Double/NaN Double/POSITIVE_INFINITY Double/NEGATIVE_INFINITY 1})
+
+(defn is-valid-edn-double?
+  [n]
+  (not (some #(.equals % n) not-yet-valid-edn-doubles)))
+
+(defn float
+  []
+  (let [f (gen/float)]
+    (if (is-valid-edn-double? f)
+      f
+      (recur))))
+
 (def num-gens
   [gen/int
    gen/long
-   gen/float
+   float
    gen/double])
 
-(defn numbers
+(defn number
   []
-  (fn [] ((rand-nth num-gens))))
+  ((rand-nth num-gens)))
 
 (def default-ns-partitions-sizer
   ^{:doc "Default sizer used to determine the number of partitions a generated namespace will have."}
@@ -126,10 +151,17 @@ Must end in a newline."
    [gen/set 1]
    [gen/hash-map 2]])
 
+(def default-collection-sizer
+  ^{:doc "Default sizer used to determine the number of elements a generated collection will have."}
+  #(normal 64))
+
 (defn mixed-collection
-  [child-fn]
-  (let [[coll-fn arg-count] (rand-nth collection-specs)]
-    (apply coll-fn  (for [_ (range arg-count)] #(child-fn)))))
+  ([child-fn]
+     (mixed-collection child-fn default-collection-sizer))
+  ([child-fn coll-sizer]
+      (let [[coll-fn arg-count] (rand-nth collection-specs)]
+        (apply coll-fn  (conj (vec (for [_ (range arg-count)] #(child-fn)))
+                              coll-sizer)))))
 
 (def scalar-collection
   "Returns a random collection of scalar elements."
@@ -137,28 +169,28 @@ Must end in a newline."
 
 (declare hierarchical-anything)
 
-(def default-hierarchy-sizer
+(def default-hierarchy-depth-sizer
   ^{:doc "Default sizer used to determine the depth a generated hierarchy will have."}
-  #(gen/uniform 1 4))
+  #(gen/uniform 1 3))
 
 (defn hierarchical-collection
-  ([] (hierarchical-collection default-hierarchy-sizer))
+  ([] (hierarchical-collection default-hierarchy-depth-sizer))
   ([depth-sizer]
      (let [depth (call-through depth-sizer)]
        (if (pos? depth)
          (mixed-collection (partial hierarchical-anything (dec depth)))
          scalar-collection))))
 
-(def default-anything-sizer
+(def default-anything-depth-sizer
   ^{:doc "Default sizer used to determine the depth a generated hierarchy will have."}
-  #(gen/uniform 0 4))
+  #(gen/uniform 0 3))
 
 (defn hierarchical-anything
   "Returns a function which returns one of either:
 a scalar-fn
 a coll-fn of scalars e.g. (gen/ven scalar)
 a hierarchical-coll-fn (of partial depth) hierarchcal-anything's"
-  ([] (hierarchical-anything default-anything-sizer))
+  ([] (hierarchical-anything default-anything-depth-sizer))
   ([depth-sizer]
      (let [depth (call-through depth-sizer)]
        (if (pos? depth)

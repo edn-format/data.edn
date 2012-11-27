@@ -54,5 +54,5 @@ separator can be a string or a fn (uses call-through)."
                            (do (printable/print (key e) w opts)
                                (writer/append w \space)
                                 (printable/print (val e) w opts)))
-                         (call-through separator))
+                         separator)
      (writer/write w "}")))
