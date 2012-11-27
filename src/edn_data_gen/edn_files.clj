@@ -133,7 +133,22 @@ Creates a file with many of those gener]ated things at top level."
   (do-file-gen (partial file-of edn-gen/hierarchical-collection) (partial typed-file-path (out-dir "hierarchy_comments_50") :hierarachy-comments) 50 {:generator/comment edn-gen/comment-block})
 
   (file-of #(gen/list gen/int 100) (out-path "ints.edn") {:generator/tag (edn-gen/occasional edn-gen/ns-keyword 20)})
-  (def _ (file-of #(gen/list gen/int 100) (out-path "ints.edn") {:generator/discard (edn-gen/occasional edn-gen/scalar 20)}))
+  (def _ (file-of #(gen/list gen/int 100) (out-path "ints.edn")
+                  {:generator/discard (edn-gen/occasional edn-gen/scalar 20)}))
+  (def _ (file-of #(gen/list gen/int 100) (out-path "ints.edn")
+                  {:generator/comment (edn-gen/occasional edn-gen/comment-block 3)
+                   :generator/whitespace (edn-gen/occasional edn-gen/whitespace-str 30)
+                   :generator/tag (edn-gen/occasional edn-gen/ns-keyword 5)
+                   :generator/discard (edn-gen/occasional gen/scalar 5)}))
+
+  (do-file-gen (partial file-of edn-gen/hierarchical-collection)
+               (partial typed-file-path (out-dir "hierarchy_noisy_50") :hierarachy-comments)
+               50
+               {:generator/comment (edn-gen/occasional edn-gen/comment-block 3)
+                :generator/whitespace (edn-gen/occasional edn-gen/whitespace-str 30)
+                :generator/tag (edn-gen/occasional edn-gen/ns-keyword 5)
+                :generator/discard (edn-gen/occasional gen/scalar 5)})
+
 
   {:file-generator :file-of-many ;; file-of-forms, file-of
    :data-generator gen/int

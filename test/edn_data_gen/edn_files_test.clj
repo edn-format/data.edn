@@ -30,4 +30,7 @@
   (test-file-of (partial gen/vec gen/keyword) 10)
   (test-file-of edn-gen/hierarchical-anything 10)
   (test-file-of edn-gen/hierarchical-anything 10 {:generator/comment edn-gen/comment-block})
-  )
+  (test-file-of edn-gen/hierarchical-anything 100 {:generator/comment (edn-gen/occasional edn-gen/comment-block 3)
+                                                   :generator/whitespace (edn-gen/occasional edn-gen/whitespace-str 30)
+                                        ;:generator/tag (edn-gen/occasional edn-gen/ns-keyword 5)
+                                                   :generator/discard (edn-gen/occasional gen/scalar 5)}))
