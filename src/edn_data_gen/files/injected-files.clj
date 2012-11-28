@@ -5,7 +5,7 @@
             [edn-data-gen.print.writers.io-writer :as io-writer]
             [edn-data-gen.files.helpers :as helpers]
             [edn-data-gen.generators :as edn-gen]
-            [clojure.test.generative.generators :as gen]))
+            [clojure.data.generators :as gen]))
 
 (defn do-file-of
   [generator n path-suffix opts]

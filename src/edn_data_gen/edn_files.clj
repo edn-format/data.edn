@@ -1,5 +1,5 @@
 (ns edn-data-gen.edn-files
-  (:require [clojure.test.generative.generators :as gen]
+  (:require [clojure.data.generators :as gen]
             [clojure.string :as string]
             [clojure.java.io :as io]
             [clojure.pprint :as pprint]

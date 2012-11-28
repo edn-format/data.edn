@@ -1,5 +1,5 @@
 (ns edn-data-gen.generators
-  (:require [clojure.test.generative.generators :as gen]
+  (:require [clojure.data.generators :as gen]
             [edn-data-gen.print.protocols.printable :as printable]
             [clojure.string :as string]
             [edn-data-gen.print.writers.io-writer :as io-writer])
