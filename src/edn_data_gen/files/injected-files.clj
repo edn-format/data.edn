@@ -71,22 +71,22 @@
 
 
 
-  (files/do-file-gen (partial files/file-of-many gen/int 50)
+  (do-file-gen (partial files/file-of-many gen/int 50)
                      #(helpers/typed-file-path (helpers/out-dir "ints_50") :int)
                      5 {})
 
 
 
-  (files/do-file-gen (partial files/file-of-many gen/int 50)
+  (do-file-gen (partial files/file-of-many gen/int 50)
                      #(helpers/typed-file-path (helpers/out-dir "ints_50") :int)
                      5 {:form-separator "\n"})
 
-  (files/do-file-gen (partial files/file-of edn-gen/hierarchical-collection)
+  (do-file-gen (partial files/file-of edn-gen/hierarchical-collection)
                      #(helpers/typed-file-path (helpers/out-dir "hierarchy_comments_50") :hierarachy-comments)
                      50 {:generator/comment edn-gen/comment-block})
 
 
-  (files/do-file-gen (partial files/file-of edn-gen/hierarchical-collection)
+  (do-file-gen (partial files/file-of edn-gen/hierarchical-collection)
                      #(helpers/typed-file-path (helpers/out-dir "hierarchy_noisy2_50") :hierarachy-comments)
                      50
                      {:generator/comment (edn-gen/occasional edn-gen/comment-block 3)

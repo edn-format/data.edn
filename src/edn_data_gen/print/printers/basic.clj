@@ -40,15 +40,3 @@
   java.lang.Object
   (print [this w opts]
     (writer/write w (str this))))
-
-
-(extend-type java.io.Writer
-  writer/IWriter
-  (append [w c]
-    (.append w c))
-  (write [w s]
-    (.write w s))
-  (flush [w]
-    (.flush w))
-  (close [w]
-    (.close w)))
