@@ -34,7 +34,7 @@ comments, whitespace, tags, and discarded data."
   (when-let [data (gen-noise :generator/discard opts)]
     (writer/write w "#_")
     (write-whitespace w opts)
-    (printable/print data w (dissoc opts :generator/discard))
+    (printable/print data w (dissoc opts :generator/discard :generator/comment))
     (writer/write w " ")))
 
 

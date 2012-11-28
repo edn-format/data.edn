@@ -2,7 +2,8 @@
   (:require [clojure.test.generative.generators :as gen]
             [edn-data-gen.print.protocols.printable :as printable]
             [clojure.string :as string]
-            [edn-data-gen.print.writers.io-writer :as io-writer]))
+            [edn-data-gen.print.writers.io-writer :as io-writer])
+  (:refer-clojure :exclude [float]))
 
 (defn call-through
   "Recursively call x until it doesn't return a function."
@@ -89,6 +90,18 @@
 (defn ns-keyword
   []
   (keyword (ns-symbol)))
+
+(def ascii-alpha
+  (concat (range 65 (+ 65 26))
+          (range 97 (+ 97 26))))
+
+(defn- tag-prefix
+  []
+  (str (char (gen/rand-nth ascii-alpha))))
+
+(defn tag-keyword
+  []
+  (keyword (str (tag-prefix) (ns-symbol))))
 
 ;; TODO: this fn should be moved to the edn-data-gen/print namespace when it exists
 ;; (defn keyword->tag-str

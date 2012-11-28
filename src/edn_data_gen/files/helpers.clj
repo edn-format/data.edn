@@ -37,3 +37,48 @@
   [path]
   (when-not (ls path)
     (make-parent-dirs path)))
+
+
+
+
+(defn out-parent
+  []
+  (str (System/getProperty "user.dir")
+       java.io.File/separator
+       "output"))
+
+(defn out-dir
+  [dir-name]
+  (str (out-parent)
+       java.io.File/separator
+       dir-name))
+
+(defn out-path
+  [filename]
+  (str (out-parent)
+       java.io.File/separator
+       filename))
+
+(defn file-name
+  []
+  (str (java.util.UUID/randomUUID) ".edn"))
+
+(defn typed-file-name
+  [type & [suffix]]
+  (let [suffix-str (when suffix (str "_" (name suffix)))]
+    (format "%s_%s%s.edn"
+            (name type)
+            (str (java.util.UUID/randomUUID))
+            (str suffix-str))))
+
+(defn file-path
+  ([]
+     (file-path (out-parent) file-name))
+  ([parent-dir file-name-gen]
+     (str parent-dir
+          java.io.File/separator
+          (file-name-gen))))
+
+(defn typed-file-path
+  [parent-dir & type-params]
+  (file-path parent-dir (apply partial (cons typed-file-name type-params))))
