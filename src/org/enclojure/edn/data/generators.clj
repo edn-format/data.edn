@@ -30,6 +30,11 @@
       result
       (recur mean))))
 
+(defn rescaled-geometric
+  "Returns a sizer with geometric distribution around n"
+  [n]
+  #(gen/geometric (/ 1 n)))
+
 (def not-yet-valid-edn-doubles
   #{Double/NaN Double/POSITIVE_INFINITY Double/NEGATIVE_INFINITY 1})
 
@@ -54,18 +59,22 @@
   []
   ((rand-nth num-gens)))
 
+(defn date
+  []
+  (java.util.Date.))
+
+(defn uuid
+  []
+  (java.util.UUID/randomUUID))
+
+
 (def default-ns-partitions-sizer
   ^{:doc "Default sizer used to determine the number of partitions a generated namespace will have."}
   #(gen/uniform 1 6))
 
-(defn rescaled-geometric
-  "Returns a sizer with geometric distribution around n"
-  [n]
-  #(gen/geometric (/ 1 n)))
-
 (def default-ns-part-length-sizer
   ^{:doc "Default sizer used to determine the length of symbol."}
-  (rescaled-geometric 10))
+  (normal 10))
 
 (defn ns-str
   "Returns a string to be passed into core/symbol as the namespace. Number of partitions of namespace is determined by sizer supplied in first argument, length of the parts are determined by the sizer supplied in second argument"
@@ -76,7 +85,6 @@
        (string/join "." (for [_ (range parts)]
                           (gen/symbol part-length-sizer))))))
 
-
 (defn ns-symbol
   "Generates a fully qualified symbol. Number of partitions determined by sizer in first argument, length of parts determined by sizer in second argument."
   ([]
@@ -86,9 +94,13 @@
   ([ns-partitions-sizer part-length-sizer]
      (symbol (ns-str ns-partitions-sizer part-length-sizer) (str (gen/symbol part-length-sizer)))))
 
+(defn small-symbol
+  []
+  (gen/symbol #(gen/uniform 1 32)))
+
 (defn any-symbol
   []
-  (gen/one-of gen/symbol ns-symbol))
+  (gen/one-of small-symbol ns-symbol))
 
 (defn any-keyword
   []
@@ -102,13 +114,31 @@
   (concat (range 65 (+ 65 26))
           (range 97 (+ 97 26))))
 
-(defn- tag-prefix
+(defn tag-prefix
   []
   (str (char (gen/rand-nth ascii-alpha))))
 
 (defn tag-keyword
   []
   (keyword (str (tag-prefix) (ns-symbol))))
+
+(def scalars
+  [(constantly nil)
+   gen/byte
+   gen/long
+   date
+   uuid
+   number
+   gen/boolean
+   gen/printable-ascii-char
+   gen/string
+   small-symbol
+   any-keyword])
+
+(defn scalar
+  "Returns a random scalar."
+  []
+  (call-through (gen/rand-nth scalars)))
 
 (def whitespace-chars
   [\newline \tab \return \space])
@@ -178,7 +208,7 @@ Must end in a newline."
 
 (def scalar-collection
   "Returns a random collection of scalar elements."
-  (partial mixed-collection gen/int))
+  (partial mixed-collection scalar))
 
 (declare hierarchical-anything)
 
@@ -214,16 +244,11 @@ a hierarchical-coll-fn (of partial depth) hierarchcal-anything's"
   ([depth-sizer count-sizer]
      (let [depth (call-through depth-sizer)]
        (if (pos? depth)
-         (gen/one-of gen/int
+         (gen/one-of scalar
                      (partial scalar-collection count-sizer)
                      (partial hierarchical-collection depth count-sizer))
-         (gen/int)))))
+         (scalar)))))
 
-;; (defn hierarchy
-;;   [depth-sizer count-sizer]
-;;   (let [depth (call-through depth-sizer)]
-;;     (if (zero? depth)
-;;       )))
 
 (defn hierarchy
   "Generate a nested collection of items, where each item
@@ -237,13 +262,6 @@ a hierarchical-coll-fn (of partial depth) hierarchcal-anything's"
        (gen-coll #(hierarchy (inc depth) max-depth length-sizer gen-coll gen-item) length-sizer))))
 
 
-;; (defn hierarchical-anything
-;;   "Returns a function which returns one of either:
-;; a scalar-fn
-;; a coll-fn of scalars e.g. (gen/ven scalar)
-;; a hierarchical-coll-fn (of partial depth) hierarchcal-anything's"
-;;   [depth]
-;;   (gen/one-of gen/scalar scalar-collection (partial hierarchical-collection depth)))
 
 (defn edn-str
   [generator opts]
@@ -251,12 +269,10 @@ a hierarchical-coll-fn (of partial depth) hierarchcal-anything's"
     (printable/print (generator) sw opts)
     (str sw)))
 
-;; (defn edn-file
-;;   [generator filewriter opts]
-;;   (printable/print (generator) filewriter opts))
-
 
 (defn occasional
-  [generator probability]
-  #(gen/weighted {nil (- 100 probability)
-                  generator probability}))
+  ([generator probability]
+     (occasional generator probability (- 100 probability)))
+  ([generator gen-prob nil-prob]
+     #(gen/weighted {nil nil-prob
+                     generator gen-prob})))
