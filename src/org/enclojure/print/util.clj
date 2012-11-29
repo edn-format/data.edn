@@ -1,7 +1,7 @@
-(ns edn-data-gen.print.helpers
+(ns org.enclojure.print.util
   "Helpers for printing collections, etc."
-  (:require [edn-data-gen.print.protocols.writer :as writer]
-            [edn-data-gen.print.protocols.printable :as printable]))
+  (:require [org.enclojure.print.protocols.writer :as writer]
+            [org.enclojure.print.protocols.printable :as printable]))
 
 (defn- call-through
   "Recursively call x until it doesn't return a function."
@@ -10,13 +10,19 @@
     (recur (x))
     x))
 
-(defn write-character [c w]
+(defn write-character
+  "Writes a character using the IWriter protocol. Named chars are looked up
+using core/char-name-string collection."
+  [c w]
   (writer/append w \\)
   (if-let [n (char-name-string c)]
     (writer/write w n)
     (writer/append w c)))
 
-(defn write-string [s w]
+(defn write-string
+  "Writres a string using the IWriter protocol. Escape chars are looked up
+using core/char-escape-string collection."
+  [s w]
   (writer/append w \")
   (dotimes [n (count s)]
     (let [c (.charAt s n)]
@@ -27,7 +33,9 @@
 
 (defn print-seq-contents
   "prints the contents of a sequence separated by separator.
-separator can be a string or a fn (uses call-through)."
+separator can be a string or a fn (uses call-through).
+Elements default to printing via the IPrintable protocol
+unless another print-one fn is supplied."
   ([coll w opts separator]
      (print-seq-contents coll w opts (fn [o w opts]
                                        (printable/print o w opts)) separator))
@@ -39,12 +47,15 @@ separator can be a string or a fn (uses call-through)."
        (print-one x w opts))))
 
 (defn print-sequential
+  "Prints a sequential collection with print-seq-contents delimited with begin & end"
   [coll w opts begin separator end]
   (writer/write w begin)
   (print-seq-contents coll w opts separator)
   (writer/write w end))
 
 (defn print-map
+  "Prints a map, with elements separated by separator (defaults to comma+pace).
+Keys and values are printed via IPrintable protocol."
   ([m w opts]
      (print-map m w opts ", "))
   ([m w opts separator]

@@ -1,4 +1,4 @@
-(ns edn-data-gen.print.protocols.printable
+(ns org.enclojure.print.protocols.printable
   "Protocol for making types printable."
   (:refer-clojure :exclude [print]))
 

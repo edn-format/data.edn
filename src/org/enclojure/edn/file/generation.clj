@@ -1,11 +1,11 @@
-(ns edn-data-gen.edn-files
+(ns org.enclojure.edn.file.generation
   (:require [clojure.data.generators :as gen]
             [clojure.string :as string]
             [clojure.java.io :as io]
             [clojure.pprint :as pprint]
-            [edn-data-gen.files.helpers :as file-helpers]
-            [edn-data-gen.print.protocols.printable :as printable]
-            [edn-data-gen.print.helpers :as print-helpers]))
+            [org.enclojure.edn.file.util :as file-util]
+            [org.enclojure.print.protocols.printable :as printable]
+            [org.enclojure.print.util :as print-util]))
 
 (defn edn-file
   [data filewriter opts]
@@ -15,11 +15,11 @@
 (defn edn-forms-file
   [coll filewriter opts]
   (with-open [f filewriter]
-    (print-helpers/print-seq-contents coll f opts (:form-separator opts))))
+    (print-util/print-seq-contents coll f opts (:form-separator opts))))
 
 (defn file-of
   ([generator file-path opts]
-     (file-helpers/ensure-parent-directory! file-path)
+     (file-util/ensure-parent-directory! file-path)
      (let [writer (io/writer file-path)
            data (generator)
            _ (edn-file data writer opts)]
@@ -31,7 +31,7 @@
   "Takes a generator which makes multiple things.
 Creates a file with those things at top level."
   ([generator file-path opts]
-     (file-helpers/ensure-parent-directory! file-path)
+     (file-util/ensure-parent-directory! file-path)
      (let [writer (io/writer file-path)
            data (generator)
            sep (:form-separator opts)

@@ -1,4 +1,4 @@
-(ns edn-data-gen.print.protocols.writer
+(ns org.enclojure.print.protocols.writer
   "Writer protocol"
   (:refer-clojure :exclude [flush]))
 

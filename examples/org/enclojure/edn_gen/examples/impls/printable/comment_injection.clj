@@ -1,8 +1,8 @@
-(ns edn-data-gen.printables.comment-injection
+(ns org.enclojure.edn-gen.examples.printable.comment-injection
   "Extending IPrintables with method of injecting comments."
-  (:require [edn-data-gen.print.protocols.writer :as writer]
-            [edn-data-gen.print.protocols.printable :as printable]
-            [edn-data-gen.print.helpers :as helpers]))
+  (:require [org.enclojure.print.protocols.writer :as writer]
+            [org.enclojure.print.protocols.printable :as printable]
+            [org.enclojure.print.util :as util]))
 
 (defn generate-comment
   [opts]
@@ -18,43 +18,43 @@
 (extend-protocol printable/IPrintable
   clojure.lang.IPersistentMap
   (print [this w opts]
-    (helpers/print-map this w opts
+    (util/print-map this w opts
                        (separator-with-comment ", " opts)))
 
   clojure.lang.PersistentVector
   (print [this w opts]
-    (helpers/print-sequential this w opts
+    (util/print-sequential this w opts
                               "["
                               (separator-with-comment " " opts)
                               "]"))
 
   clojure.lang.IPersistentSet
   (print [this w opts]
-    (helpers/print-sequential this w opts
+    (util/print-sequential this w opts
                               "#{"
                               (separator-with-comment ", " opts)
                               "}"))
 
   clojure.lang.IPersistentList
   (print [this w opts]
-    (helpers/print-sequential this w opts
+    (util/print-sequential this w opts
                               "("
                               (separator-with-comment " " opts)
                               ")"))
 
   clojure.lang.LazySeq
   (print [this w opts]
-    (helpers/print-sequential this w opts
+    (util/print-sequential this w opts
                               "("
                               (separator-with-comment " " opts)
                               ")"))
 
   java.lang.String
   (print [this w opts]
-    (helpers/write-string this w))
+    (util/write-string this w))
   java.lang.Character
   (print [this w opts]
-    (helpers/write-character this w))
+    (util/write-character this w))
   java.lang.Object
   (print [this w opts]
     (writer/write w (str this)))

@@ -1,16 +1,16 @@
-(ns edn-data-gen.edn-files-test
-  "Short package description."
-  (:require [edn-data-gen.edn-files :as files]
-            [edn-data-gen.generators :as edn-gen]
-            [clojure.test.generative.generators :as gen]
-            [clojure.java.io :as io])
+(ns org.enclojure.edn.file.generation-test
+  (:require [clojure.data.generators :as gen]
+            [clojure.java.io :as io]
+            [org.enclojure.edn.data.generators :as edn-gen]
+            [org.enclojure.edn.file.generation :as files]
+            [org.enclojure.edn.file.util :as util])
   (:use clojure.test))
 
 (defn test-file-of
   ([generator n]
      (test-file-of generator n {}))
   ([generator n opts]
-     (doseq [out (files/file-gen (partial files/file-of generator) files/file-path n opts)]
+     (doseq [out (files/file-gen (partial files/file-of generator) util/file-path n opts)]
        (let [read-data (with-open [r (io/reader (out :path))]
                          (read (java.io.PushbackReader. r)))]
          (if (= read-data

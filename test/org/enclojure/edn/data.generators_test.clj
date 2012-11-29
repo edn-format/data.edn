@@ -1,8 +1,7 @@
-(ns edn-data-gen.generators-test
-  (:use edn-data-gen.generators
+(ns org.enclojure.edn.data.generators-test
+  (:use org.enclojure.edn.data.generators
         clojure.test)
-  (:require [clojure.test.generative.generators :as gen]))
-
+  (:require [clojure.data.generators :as gen]))
 
 (def symbol-start-chars
   (set (map char @#'gen/symbol-start)))
@@ -83,10 +82,3 @@
                   (concat (keys data) (vals data))
                   data)]
          (apply max (map (partial depth-count (inc depth)) vs))))))
-
-(deftest hierarchical-anything-test
-  (testing "hierarchical anything generation"
-    (doseq [depth (range 3)
-            _ (range 15)]
-      (is (>= depth
-             (depth-count (hierarchical-anything depth)))))))

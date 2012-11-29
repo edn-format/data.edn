@@ -1,4 +1,4 @@
-(ns edn-data-gen.files.helpers
+(ns org.enclojure.edn.file.util
   "Utility functions for files and directories."
   (:require [clojure.java.io :as io]))
 
@@ -37,9 +37,6 @@
   [path]
   (when-not (ls path)
     (make-parent-dirs path)))
-
-
-
 
 (defn out-parent
   []

@@ -1,8 +1,8 @@
-(ns edn-data-gen.generators
+(ns org.enclojure.edn.data.generators
   (:require [clojure.data.generators :as gen]
-            [edn-data-gen.print.protocols.printable :as printable]
             [clojure.string :as string]
-            [edn-data-gen.print.writers.io-writer :as io-writer])
+            [org.enclojure.impls.writer.io-writer :as io-writer]
+            [org.enclojure.print.protocols.printable :as printable])
   (:refer-clojure :exclude [float]))
 
 (defn call-through
@@ -102,17 +102,6 @@
 (defn tag-keyword
   []
   (keyword (str (tag-prefix) (ns-symbol))))
-
-;; TODO: this fn should be moved to the edn-data-gen/print namespace when it exists
-;; (defn keyword->tag-str
-;;   [k]
-;;   (if-let [ns (namespace k)]
-;;     (str "#" ns "/" (name k))
-;;     (str "#" (name k))))
-
-;; (defn tag
-;;   []
-;;   (keyword->tag-str (ns-keyword)))
 
 (def whitespace-chars
   [\newline \tab \return \space])
