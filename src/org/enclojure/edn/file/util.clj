@@ -9,6 +9,13 @@
   "Utility functions for files and directories."
   (:require [clojure.java.io :as io]))
 
+(defn call-through
+  "Recursively call x until it doesn't return a function."
+  [x]
+  (if (fn? x)
+    (recur (x))
+    x))
+
 (defn- file-exists?
   "returns a bool indicating whether a dir or file exists"
   [path]
@@ -44,6 +51,12 @@
   [path]
   (when-not (ls path)
     (make-parent-dirs path)))
+
+(defn ensure-path!
+  [path-gen]
+  (let [path (call-through path-gen)]
+    (ensure-parent-directory! path)
+    path))
 
 (defn out-parent
   []
