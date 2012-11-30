@@ -37,12 +37,10 @@ This is built on top of clojure.data.generators to generate data for creating of
 
 ## To Do
 
-- write docstrings for edn.data.generators
 - write tests of round-tripping to/from edn strings
 - create alternate version of gen-many that generates data and prints it with n print configurations
 - create script for outputting a suite of edn test data files (bash & lein)
 - printing doubles in various formats
-- generate random dates (instead of just _now_)
 - declarative spec for data generation
 - service API
 
