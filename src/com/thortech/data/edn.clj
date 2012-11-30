@@ -7,7 +7,8 @@
 
 (ns ^{:author "Tom Hickey, Jim Altieri"}
   com.thortech.data.edn
-  "Generate edn by printing using the IPrintble protocol to a writer that impliment IWriter."
+  "Generate edn by printing using the IPrintble protocol
+to a writer that impliments the IWriter protocol."
   (:require [clojure.data.generators :as gen]
             [clojure.java.io :as io]
             [com.thortech.data.edn.file-util :as file-util]
@@ -44,7 +45,8 @@
     (str sw)))
 
 (defn forms-string
-  "Create an edn string with the contents of coll. Passing opts through to a StringWriter."
+  "Create an edn string with the contents of coll.
+Passing opts through to a StringWriter."
   [coll opts]
   (let [sw (java.io.StringWriter.)
         _ (edn-forms coll sw opts)]
