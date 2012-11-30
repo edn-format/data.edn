@@ -1,4 +1,4 @@
-# org.enclojure.edn-gen
+# data.edn
 
 A Clojure library for creation of edn data.
 
@@ -6,29 +6,54 @@ A Clojure library for creation of edn data.
 
 FIXME
 
-For now, you can see an example of printing edn data to a file in [examples/org/enclojure/edn_gen/examples/interjected_files.clj](http://github.com/ThorTech/edn-data-gen/blob/master/examples/org/enclojure/edn_gen/examples/interjected_files.clj)
+For now, you can see an example of printing edn data to a file in [examples/com/thortech/data/edn/examples/create_files.clj](http://github.com/ThorTech/data.edn/blob/master/examples/com/thortech/data/edn/examples/create_files.clj)
 
-## Installation
+
+## Releases and dependency information
+
+Latest stable release: 0.1.0
 
 With [Leiningen](http://github.com/technomancy/leiningen), add the following to you `project.clj` file:
 
-    [org.enclojure/edn-gen "0.1.0-SNAPSHOT"]
+    [com.thortech/data.edn "0.1.0"]
 
-With Maven, add the following to your `pom.xml` file:
+With [Maven](http://maven.apache.org), add the following to your `pom.xml` file:
 
     <dependency>
-      <groupId>org.enclojure</groupId>
-      <artifactId>edn-gen</artifactId>
-      <version>0.1.0-SNAPSHOT</version>
+      <groupId>com.thortech</groupId>
+      <artifactId>data.edn</artifactId>
+      <version>0.1.0</version>
     </dependency>
 
 ## Reference
 
-[API Documentation](http://enclojure.github.com/edn-gen)
+[API Documentation](http://thortech.github.com/data.edn)
+
+## Rationale
+
+In order to test different implementations of edn data readers/writers on different platforms, we needed a way to generate comprehensive edn test data sets. We also wanted to be able to test introducing “noise” into the input streams to ensure the edn readers handles this. By “noise” we mean: comments, discard, whitespace (newlines, carriage returns).
+
+This is built on top of clojure.data.generators to generate data for creating of edn.
 
 ## To Do
 
-FIXME
+- write docstrings for edn.data.generators
+- write tests of round-tripping to/from edn strings
+- create alternate version of gen-many that generates data and prints it with n print configurations
+- create script for outputting a suite of edn test data files (bash & lein)
+- printing doubles in various formats
+- generate random dates (instead of just _now_)
+- declarative spec for data generation
+- service API
+
+## YourKit
+
+YourKit has given an open source license for their profiler, greatly simplifying the profiling of core.logic performance.
+
+YourKit is kindly supporting open source projects with its full-featured Java Profiler. YourKit, LLC is the creator of innovative and intelligent tools for profiling Java and .NET applications. Take a look at YourKit's leading software products:
+
+- [YourKit Java Profiler](http://www.yourkit.com/java/profiler/index.jsp) and
+- [YourKit .NET Profiler](http://www.yourkit.com/.net/profiler/index.jsp).
 
 ## License
 
