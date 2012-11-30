@@ -33,6 +33,7 @@
       {:out (edn-gen-fn data opts)
        :data data})))
 
+
 ;;; Strings
 
 (defn string
@@ -57,7 +58,6 @@
 
 
 ;;; Files
-
 
 (defn write-file
   "Creates a file of edn data."
