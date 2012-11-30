@@ -154,14 +154,15 @@
 (def edn-whitespace-chars
   (conj whitespace-chars \,))
 
+(def default-whitespace-sizer
+  ^{:doc "Default sizer for strings of whitespace (geometric distribution with a mean of 5"}
+  (rescaled-geometric 5))
+
 (defn whitespace-str
   ([]
-     (whitespace-str gen/default-sizer))
+     (whitespace-str default-whitespace-sizer))
   ([sizer]
      (gen/string #(char (rand-nth whitespace-chars)) sizer)))
-
-(def default-whitespace-sizer
-  (rescaled-geometric 5))
 
 (defn weighted-whitespace-str
   ([]
