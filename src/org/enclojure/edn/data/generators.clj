@@ -134,7 +134,6 @@
 (def scalars
   [(constantly nil)
    gen/byte
-   gen/long
    date
    uuid
    number
