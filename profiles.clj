@@ -1,6 +1,6 @@
 {:dev
  {:plugins [[codox "0.6.3"]]
-  :codox {:src-dir-uri "http://github.com/enclojure/edn-gen/blob/refactor"
+  :codox {:src-dir-uri "http://github.com/ThorTech/data.edn/blob/master"
           :src-linenum-anchor-prefix "L"}}
  :release
  {:plugins [[lein-set-version "0.2.1"]]
