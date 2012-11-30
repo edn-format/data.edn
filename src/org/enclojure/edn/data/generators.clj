@@ -70,8 +70,9 @@
   ((rand-nth num-gens)))
 
 (defn date
+  "Generates a random clojure date"
   []
-  (java.util.Date.))
+  (java.util.Date. ((rescaled-geometric 1190433600000))))
 
 (defn uuid
   []
