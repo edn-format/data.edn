@@ -38,8 +38,6 @@
   #(gen/geometric (/ 1 n)))
 
 (defn occasional
-  ([generator probability]
-     (occasional generator probability (- 100 probability)))
   ([generator gen-prob nil-prob]
      #(gen/weighted {nil nil-prob
                      generator gen-prob})))
@@ -197,8 +195,10 @@ Must end in a newline."
   (rescaled-geometric 2))
 
 (defn comment-block
-  []
-  (gen/string comment-line default-comment-block-sizer))
+  ([]
+     (comment-block default-comment-block-sizer))
+  ([sizer]
+      (gen/string comment-line sizer)))
 
 (def collection-specs
   [[gen/vec 1]
