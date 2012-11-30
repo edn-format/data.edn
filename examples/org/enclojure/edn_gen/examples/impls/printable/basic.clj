@@ -5,7 +5,8 @@
 ;;;; the terms of this license.
 ;;;; You must not remove this notice, or any other, from this software.
 
-(ns org.enclojure.edn-gen.examples.printable.basic
+(ns ^{:author "Tom Hickey, Jim Altieri"}
+  org.enclojure.edn-gen.examples.printable.basic
   "Basic example of extending IPrintable to core types.
 Simply uses spaces for delimiters."
   (:require [org.enclojure.print.protocols.writer :as writer]

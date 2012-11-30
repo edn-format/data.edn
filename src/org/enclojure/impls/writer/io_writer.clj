@@ -5,7 +5,8 @@
 ;;;; the terms of this license.
 ;;;; You must not remove this notice, or any other, from this software.
 
-(ns org.enclojure.impls.writer.io-writer
+(ns ^{:author "Tom Hickey, Jim Altieri"}
+  org.enclojure.impls.writer.io-writer
   "Implementation of the IWriter protocol extended to java.io.Writer"
   (:require [org.enclojure.print.protocols.writer :as writer]))
 

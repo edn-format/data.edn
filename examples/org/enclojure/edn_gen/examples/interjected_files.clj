@@ -5,7 +5,8 @@
 ;;;; the terms of this license.
 ;;;; You must not remove this notice, or any other, from this software.
 
-(ns org.enclojure.edn-gen.examples.interjected-files
+(ns ^{:author "Tom Hickey, Jim Altieri"}
+  org.enclojure.edn-gen.examples.interjected-files
   "Example of creating files of edn data using the printable.interposed impl of IPrintable."
   (:require [clojure.data.generators :as gen]
             [org.enclojure.edn.data.generators :as edn-gen]

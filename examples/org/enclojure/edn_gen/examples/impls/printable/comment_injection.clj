@@ -5,7 +5,8 @@
 ;;;; the terms of this license.
 ;;;; You must not remove this notice, or any other, from this software.
 
-(ns org.enclojure.edn-gen.examples.printable.comment-injection
+(ns ^{:author "Tom Hickey, Jim Altieri"}
+  org.enclojure.edn-gen.examples.printable.comment-injection
   "Extending IPrintables with method of injecting comments."
   (:require [org.enclojure.print.protocols.writer :as writer]
             [org.enclojure.print.protocols.printable :as printable]

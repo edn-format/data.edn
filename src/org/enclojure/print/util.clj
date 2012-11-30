@@ -5,7 +5,8 @@
 ;;;; the terms of this license.
 ;;;; You must not remove this notice, or any other, from this software.
 
-(ns org.enclojure.print.util
+(ns ^{:author "Tom Hickey, Jim Altieri"}
+  org.enclojure.print.util
   "Helpers for printing collections, etc."
   (:require [org.enclojure.print.protocols.writer :as writer]
             [org.enclojure.print.protocols.printable :as printable]))

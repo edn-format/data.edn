@@ -5,7 +5,8 @@
 ;;;; the terms of this license.
 ;;;; You must not remove this notice, or any other, from this software.
 
-(ns org.enclojure.print.protocols.writer
+(ns ^{:author "Tom Hickey, Jim Altieri"}
+  org.enclojure.print.protocols.writer
   "Writer protocol"
   (:refer-clojure :exclude [flush]))
 

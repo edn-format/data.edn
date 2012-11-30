@@ -5,7 +5,8 @@
 ;;;; the terms of this license.
 ;;;; You must not remove this notice, or any other, from this software.
 
-(ns org.enclojure.edn.file.util
+(ns ^{:author "Tom Hickey, Jim Altieri"}
+  org.enclojure.edn.file.util
   "Utility functions for files and directories."
   (:require [clojure.java.io :as io]))
 
@@ -65,10 +66,12 @@
        "output"))
 
 (defn out-dir
-  [dir-name]
-  (str (out-parent)
-       java.io.File/separator
-       dir-name))
+  ([parent-dir dir-name]
+     (str parent-dir
+          java.io.File/separator
+          dir-name))
+  ([dir-name]
+      (out-dir (out-parent) dir-name)))
 
 (defn out-path
   [filename]
@@ -99,3 +102,9 @@
 (defn typed-file-path
   [parent-dir & type-params]
   (file-path parent-dir (apply partial (cons typed-file-name type-params))))
+
+(defn file-run-path
+  ([run-id]
+     (file-run-path (out-parent) run-id))
+  ([parent-dir run-id]
+      (file-path (out-dir parent-dir (name run-id)) #(typed-file-name run-id))))

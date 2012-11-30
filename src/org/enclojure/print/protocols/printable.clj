@@ -5,7 +5,8 @@
 ;;;; the terms of this license.
 ;;;; You must not remove this notice, or any other, from this software.
 
-(ns org.enclojure.print.protocols.printable
+(ns ^{:author "Tom Hickey, Jim Altieri"}
+  org.enclojure.print.protocols.printable
   "Protocol for making types printable."
   (:refer-clojure :exclude [print]))
 

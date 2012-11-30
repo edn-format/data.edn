@@ -5,7 +5,8 @@
 ;;;; the terms of this license.
 ;;;; You must not remove this notice, or any other, from this software.
 
-(ns org.enclojure.impls.printable.interjection
+(ns ^{:author "Tom Hickey, Jim Altieri"}
+  org.enclojure.impls.printable.default
   "Extending IPrintable to core types with a method of interjecting
 comments, whitespace, tags, and discarded data amongst the printing of the actual data."
   (:require [org.enclojure.print.protocols.writer :as writer]

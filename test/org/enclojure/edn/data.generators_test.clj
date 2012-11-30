@@ -5,7 +5,8 @@
 ;;;; the terms of this license.
 ;;;; You must not remove this notice, or any other, from this software.
 
-(ns org.enclojure.edn.data.generators-test
+(ns ^{:author "Tom Hickey, Jim Altieri"}
+  org.enclojure.edn.data.generators-test
   (:use org.enclojure.edn.data.generators
         clojure.test)
   (:require [clojure.data.generators :as gen]))
