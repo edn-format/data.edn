@@ -17,7 +17,7 @@
 
 (defn do-file
   [generator n path-suffix opts]
-  (edn/file (generator) n (file-util/out-path path-suffix) opts)
+  (edn/file (file-util/out-path path-suffix) (generator n) opts)
   nil)
 
 (defn do-file-of-many
@@ -30,30 +30,31 @@
 
 (comment
   (do-file-of-many gen/int 100 "ints.edn" {})
-  (do-file-of-many edn-gen/date 10 "insants.edn" {})
-  (do-file-of-many edn-gen/uuid 10 "uuids.edn" {})
   (do-file-of-many gen/float 100 "floats.edn" {})
   (do-file-of-many edn-gen/number 100 "numbers.edn" {})
   (do-file-of-many edn-gen/any-keyword 100 "keywords.edn" {})
   (do-file-of-many #(edn-gen/hierarchy 2 3 edn-gen/mixed-collection edn-gen/scalar)
                    10"hierarchical.edn" {:form-separator "\n"})
+  (do-file-of-many edn-gen/date 10 "insants.edn" {})
+  (do-file-of-many edn-gen/uuid 10 "uuids.edn" {})
 
   (do-file-of-many gen/int 100 "ints-with-comments.edn" {:form-separator edn-gen/comment-block})
   (do-file-of-many gen/int 100 "ints-with-newline.edn" {:form-separator "\n"})
 
-  (edn/file (gen/list gen/int 100)
-            (file-util/out-path "ints.edn")
-            {:generator/tag (edn-gen/occasional edn-gen/tag-keyword 20)})
+  (edn/file (file-util/out-path "list-of-ints.edn")
+            (gen/list gen/int 100)
+            {:generator/tag (edn-gen/occasional edn-gen/tag-keyword 2 10)})
 
-  (def _ (edn/file (gen/list gen/int 100)
-                        (file-util/out-path "ints.edn")
-                        {:generator/discard (edn-gen/occasional gen/scalar 20)}))
-  (def _ (edn/file (gen/list gen/int 100)
-                        (file-util/out-path "ints.edn")
-                        {:generator/comment (edn-gen/occasional edn-gen/comment-block 3)
-                         :generator/whitespace (edn-gen/occasional edn-gen/whitespace-str 30)
-                         :generator/tag (edn-gen/occasional edn-gen/tag-keyword 5)
-                         :generator/discard (edn-gen/occasional gen/scalar 5)}))
+  (edn/file (file-util/out-path "ints-with-discard.edn")
+            (gen/list gen/int 100)
+            {:generator/discard (edn-gen/occasional gen/scalar 2 10)})
+
+  (edn/file (file-util/out-path "ints-with-noise.edn")
+            (gen/list gen/int 100)
+            {:generator/comment (edn-gen/occasional edn-gen/comment-block 3 100)
+             :generator/whitespace (edn-gen/occasional edn-gen/whitespace-str 3 10)
+             :generator/tag (edn-gen/occasional edn-gen/tag-keyword 1 20)
+             :generator/discard (edn-gen/occasional gen/scalar 1 20)})
 
 
   (edn/file-of-many gen/int 100 (file-util/out-path "ints.edn") {})
@@ -65,49 +66,43 @@
   (edn/file-of-many gen/int 100 (file-util/out-path "ints.edn") {:form-separator edn-gen/comment-block})
   (edn/file-of-many gen/int 100 (file-util/out-path "ints.edn") {:form-separator "\n"})
 
-  (edn/file (gen/list gen/int 100)
-            (file-util/out-path "ints.edn")
-            {:generator/tag (edn-gen/occasional edn-gen/tag-keyword 20)})
+  (dorun (edn/many-forms-files
+          #(file-util/typed-file-path (file-util/out-dir "ints_50b") :int)
+          #(gen/list gen/int 50)
+          5
+          {}))
+  (dorun (edn/gen-files-of-many gen/int 50
+                                #(file-util/typed-file-path (file-util/out-dir "many_ints_50") :int)
+                                5
+                                {}))
 
-  (def _ (edn/file (gen/list gen/int 100)
-                   (file-util/out-path "ints.edn")
-                   {:generator/discard (edn-gen/occasional gen/scalar 20)}))
-  (def _ (edn/file (gen/list gen/int 100)
-                   (file-util/out-path "ints.edn")
-                   {:generator/comment (edn-gen/occasional edn-gen/comment-block 3)
-                    :generator/whitespace (edn-gen/occasional edn-gen/whitespace-str 30)
-                    :generator/tag (edn-gen/occasional edn-gen/tag-keyword 5)
-                    :generator/discard (edn-gen/occasional gen/scalar 5)}))
-
-
-
-  #_(do-file-gen (partial edn/file-of-many gen/int 50)
-               #(file-util/typed-file-path (file-util/out-dir "ints_50") :int)
-               5 {})
+  (dorun (edn/gen-files-of-many gen/int 50
+                                #(file-util/typed-file-path (file-util/out-dir "many_ints_newlines_50") :int)
+                                5 {:form-separator "\n"}))
 
 
+  (dorun (edn/many-files #(file-util/file-run-path "hierarchy_10")
+                         #(edn-gen/any-hierarchy 4 3 edn-gen/mixed-collection edn-gen/scalar)
+                         10
+                         {}))
 
-  #_(do-file-gen (partial edn/file-of-many gen/int 50)
-               #(file-util/typed-file-path (file-util/out-dir "ints_50") :int)
-               5 {:form-separator "\n"})
-
-  #_(do-file-gen (partial edn/file-of edn-gen/hierarchical-collection)
-               #(file-util/typed-file-path (file-util/out-dir "hierarchy_comments_10") :hierarachy-comments)
-               10 {:generator/comment edn-gen/comment-block})
-
-
-  #_(do-file-gen (partial edn/file-of edn-gen/hierarchical-collection)
-               #(file-util/typed-file-path (file-util/out-dir "hierarchy_noisy10") :hierarachy-comments)
-               10
-               {:generator/comment (edn-gen/occasional edn-gen/comment-block 3)
-                :generator/whitespace (edn-gen/occasional edn-gen/whitespace-str 30)
-                :generator/tag (edn-gen/occasional edn-gen/tag-keyword 5)
-                :generator/discard (edn-gen/occasional gen/scalar 5)})
+  (dorun (edn/many-files #(file-util/file-run-path "hierarchy_comments_10")
+                         #(edn-gen/any-hierarchy 4 3 edn-gen/mixed-collection edn-gen/scalar)
+                         10
+                         {:generator/comment edn-gen/comment-block}))
 
 
-  {:file-generator :file-of-many ;; file-of-forms, file-of
-   :data-generator gen/int
-   :form-sizer 50
-   :file-path-gen  (file-util/typed-file-path (out-dir "ints_50") :int)
-   :file-count 5}
+  (dorun (edn/many-files #(file-util/file-run-path "hierarchy_noisy_10")
+                         #(edn-gen/any-hierarchy 4 3 edn-gen/mixed-collection edn-gen/scalar)
+                         10
+                         {:generator/comment (edn-gen/occasional edn-gen/comment-block 1 33)
+                          :generator/whitespace (edn-gen/occasional edn-gen/whitespace-str 3 10)
+                          :generator/tag (edn-gen/occasional edn-gen/tag-keyword 1 20)
+                          :generator/discard (edn-gen/occasional gen/scalar 1 20)}))
+
+  ;; {:file-generator :file-of-many ;; file-of-forms, file-of
+  ;;  :data-generator :gen/int
+  ;;  :form-sizer 50
+  ;;  :file-path-gen  {:run/path "ints_50"}
+  ;;  :file-count 5}
   )

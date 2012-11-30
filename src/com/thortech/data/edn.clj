@@ -111,3 +111,9 @@ creates n forms-files passing through opts"
      (forms-file file-path (gen/list generator) opts))
   ([generator sizer file-path opts]
      (forms-file file-path (gen/list generator sizer) opts)))
+
+(defn gen-files-of-many
+  ([generator file-path n opts]
+     (many-forms-files file-path #(gen/list generator) n opts))
+  ([generator sizer file-path n opts]
+     (many-forms-files file-path #(gen/list generator sizer) n opts)))
