@@ -101,6 +101,14 @@ Uses value-printing-fn to print the actual data."
   (print [this w opts]
     (interject-noise w opts
                          #(util/write-character this w)))
+  java.util.Date
+  (print [this w opts]
+    (interject-noise w opts
+                         #(util/write-date this w)))
+  java.util.UUID
+  (print [this w opts]
+    (interject-noise w opts
+                         #(util/write-uuid this w)))
   java.lang.Object
   (print [this w opts]
     (interject-noise w opts

@@ -75,3 +75,26 @@ Keys and values are printed via IPrintable protocol."
                                 (printable/print (val e) w opts)))
                          separator)
      (writer/write w "}")))
+
+(def ^:private thread-local-utc-date-format
+  ;; SimpleDateFormat is not thread-safe, so we use a ThreadLocal proxy for access.
+  ;; http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4228335
+  (proxy [ThreadLocal] []
+    (initialValue []
+      (doto (java.text.SimpleDateFormat. "yyyy-MM-dd'T'HH:mm:ss.SSS-00:00")
+        ;; RFC3339 says to use -00:00 when the timezone is unknown (+00:00 implies a known GMT)
+        (.setTimeZone (java.util.TimeZone/getTimeZone "GMT"))))))
+
+(defn write-date
+  "Write a java.util.Date using the IWriter protocol
+as RFC3339 timestamp, always in UTC."
+  [^java.util.Date d w]
+  (let [utc-format (.get thread-local-utc-date-format)]
+    (writer/write w "#inst \"")
+    (writer/write w (.format utc-format d))
+    (writer/write w "\"")))
+
+(defn write-uuid
+  "Write a java.util.UUID using the IWriter protocol."
+  [^java.util.UUID uuid w]
+  (writer/write w (str "#uuid \"" (str uuid) "\"")))

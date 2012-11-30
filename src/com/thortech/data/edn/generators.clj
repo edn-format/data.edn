@@ -254,8 +254,6 @@ a generated collection will have."}
   ^{:doc "Returns a random collection of scalar elements."}
   (partial mixed-collection scalar))
 
-(declare hierarchical-anything)
-
 (def default-hierarchy-depth-sizer
   ^{:doc "Default sizer used to determine the depth
 a generated hierarchy will have."}

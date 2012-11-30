@@ -30,14 +30,16 @@
 
 (comment
   (do-file-of-many gen/int 100 "ints.edn" {})
+  (do-file-of-many edn-gen/date 10 "insants.edn" {})
+  (do-file-of-many edn-gen/uuid 10 "uuids.edn" {})
   (do-file-of-many gen/float 100 "floats.edn" {})
   (do-file-of-many edn-gen/number 100 "numbers.edn" {})
   (do-file-of-many edn-gen/any-keyword 100 "keywords.edn" {})
-  (do-file-of-many edn-gen/hierarchical-collection 10 "hierarchical.edn" {})
+  (do-file-of-many #(edn-gen/hierarchy 2 3 edn-gen/mixed-collection edn-gen/scalar)
+                   10"hierarchical.edn" {:form-separator "\n"})
 
   (do-file-of-many gen/int 100 "ints-with-comments.edn" {:form-separator edn-gen/comment-block})
   (do-file-of-many gen/int 100 "ints-with-newline.edn" {:form-separator "\n"})
-
 
   (edn/file (gen/list gen/int 100)
             (file-util/out-path "ints.edn")
