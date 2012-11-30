@@ -10,7 +10,7 @@
   "Utility functions for files and directories."
   (:require [clojure.java.io :as io]))
 
-(defn call-through
+(defn- call-through
   "Recursively call x until it doesn't return a function."
   [x]
   (if (fn? x)
