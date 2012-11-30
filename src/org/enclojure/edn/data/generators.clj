@@ -38,19 +38,22 @@
   #(gen/geometric (/ 1 n)))
 
 (defn occasional
+  "Produces a new generator which either returns the result of the generator passed as an argument or nil, depending on the relative probabilities (integers)"
   ([generator gen-prob nil-prob]
      #(gen/weighted {nil nil-prob
                      generator gen-prob})))
 
-
 (def not-yet-valid-edn-doubles
+  ^{:doc "These values are valid java Doubles, but not yet edn readable"}
   #{Double/NaN Double/POSITIVE_INFINITY Double/NEGATIVE_INFINITY 1})
 
 (defn is-valid-edn-double?
+  "Checks if double argument is a valid edn double"
   [n]
   (not (some #(.equals % n) not-yet-valid-edn-doubles)))
 
 (defn float
+  "Returns a random float, excluding the NaN and infinities, which are not yet edn readable"
   []
   (let [f (gen/float)]
     (if (is-valid-edn-double? f)
@@ -58,12 +61,14 @@
       (recur))))
 
 (def num-gens
+  ^{:doc "vector of number generators, for use in generating all-types of numbers"}
   [gen/int
    gen/long
    float
    gen/double])
 
 (defn number
+  "Generates a random number (int, long, float, double)"
   []
   ((rand-nth num-gens)))
 
@@ -73,6 +78,7 @@
   (java.util.Date. ((rescaled-geometric 1190433600000))))
 
 (defn uuid
+  "Generates a random UUID"
   []
   (java.util.UUID/randomUUID))
 
@@ -104,34 +110,42 @@
      (symbol (ns-str ns-partitions-sizer part-length-sizer) (str (gen/symbol part-length-sizer)))))
 
 (defn small-symbol
+  "Generates a symbol from 1 to 32 characters long"
   []
   (gen/symbol #(gen/uniform 1 32)))
 
 (defn any-symbol
+  "Generates either an unqualified or fully-namespace-qualified symbol"
   []
   (gen/one-of small-symbol ns-symbol))
 
 (defn any-keyword
+  "Generates either an unqualified or fully-namespace-qualified keyword"
   []
   (keyword (any-symbol)))
 
 (defn ns-keyword
+  "Generates a fully-namespace-qualified keyword"
   []
   (keyword (ns-symbol)))
 
 (def ascii-alpha
+  ^{:doc "The list of alphabetic characters"}
   (concat (range 65 (+ 65 26))
           (range 97 (+ 97 26))))
 
 (defn tag-prefix
+  "Generates a random alphabetic character"
   []
   (str (char (gen/rand-nth ascii-alpha))))
 
 (defn tag-keyword
+  "Generates a keyword that can be used as a tag"
   []
   (keyword (str (tag-prefix) (ns-symbol))))
 
 (def scalars
+  ^{:doc "A vector of all scalar (not a collection) generators"}
   [(constantly nil)
    gen/byte
    date
@@ -149,9 +163,11 @@
   (call-through (gen/rand-nth scalars)))
 
 (def whitespace-chars
+  ^{:doc "Vector of standard whitespace characters"}
   [\newline \tab \return \space])
 
 (def edn-whitespace-chars
+  ^{:doc "Vector of characters considered whitespace in edn"}
   (conj whitespace-chars \,))
 
 (def default-whitespace-sizer
@@ -159,12 +175,14 @@
   (rescaled-geometric 5))
 
 (defn whitespace-str
+  "Generates a string of only whitespace"
   ([]
      (whitespace-str default-whitespace-sizer))
   ([sizer]
      (gen/string #(char (rand-nth whitespace-chars)) sizer)))
 
 (defn weighted-whitespace-str
+  "Generates a string of whitespace, opinionatedly weighted at 20:5:1 :: space:newline:random-whitespaces"
   ([]
      (weighted-whitespace-str default-whitespace-sizer))
   ([sizer]
@@ -174,33 +192,37 @@
                  sizer)))
 
 (defn edn-whitespace-str
+  "Generates a string of edn whitespace"
   ([]
      (edn-whitespace-str gen/default-sizer))
   ([sizer]
      (gen/string #(char (rand-nth edn-whitespace-chars)) sizer)))
 
 (defn comment-str
-  []
   "Generate a semicolon, single-line string, and a newline"
+  []
   (str ";" (gen/string) "\n"))
 
 (defn comment-line
-  []
   "A comment-line can start with any amount of whitespace.
 Before any non-whitespace characters must contain a semicolon.
 Must end in a newline."
+  []
   (str (weighted-whitespace-str) (comment-str)))
 
 (def default-comment-block-sizer
+  ^{:doc "gives a default sizer for comment blocks"}
   (rescaled-geometric 2))
 
 (defn comment-block
+  "Generates a comment block consisting of sizer lines of comments"
   ([]
      (comment-block default-comment-block-sizer))
   ([sizer]
       (gen/string comment-line sizer)))
 
 (def collection-specs
+  ^{:doc "a vector which specifies how many child-fn arguments each collection generator takes"}
   [[gen/vec 1]
    [gen/set 1]
    [gen/hash-map 2]])
@@ -210,6 +232,7 @@ Must end in a newline."
   #(normal 64))
 
 (defn mixed-collection
+  "Generates a collection of size coll-sizer with children specified by child-fn"
   ([child-fn]
      (mixed-collection child-fn default-collection-sizer))
   ([child-fn coll-sizer]
@@ -218,7 +241,7 @@ Must end in a newline."
                               coll-sizer)))))
 
 (def scalar-collection
-  "Returns a random collection of scalar elements."
+  ^{:doc "Returns a random collection of scalar elements."}
   (partial mixed-collection scalar))
 
 (declare hierarchical-anything)
