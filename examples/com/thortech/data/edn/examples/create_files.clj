@@ -34,7 +34,7 @@
   (do-file-of-many edn-gen/number 100 "numbers.edn" {})
   (do-file-of-many edn-gen/any-keyword 100 "keywords.edn" {})
   (do-file-of-many #(edn-gen/hierarchy 2 3 edn-gen/mixed-collection edn-gen/scalar)
-                   10"hierarchical.edn" {:form-separator "\n"})
+                   10 "hierarchical.edn" {:form-separator "\n"})
   (do-file-of-many edn-gen/date 10 "insants.edn" {})
   (do-file-of-many edn-gen/uuid 10 "uuids.edn" {})
 

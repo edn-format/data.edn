@@ -18,7 +18,7 @@
   ([generator n]
      (test-file-of generator n {}))
   ([generator n opts]
-     (doseq [out (edn/file-gen (partial edn/file-of generator) util/file-path n opts)]
+     (doseq [out (edn/gen-files-of-many generator util/file-path n opts)]
        (let [read-data (with-open [r (io/reader (out :path))]
                          (read (java.io.PushbackReader. r)))]
          (if (= read-data
@@ -36,9 +36,37 @@
   (test-file-of (partial gen/vec edn-gen/float) 10)
   (test-file-of (partial gen/vec gen/string) 10)
   (test-file-of (partial gen/vec gen/keyword) 10)
-  (test-file-of edn-gen/hierarchical-anything 10)
-  (test-file-of edn-gen/hierarchical-anything 10 {:generator/comment edn-gen/comment-block})
-  (test-file-of edn-gen/hierarchical-anything 100 {:generator/comment (edn-gen/occasional edn-gen/comment-block 3)
-                                                   :generator/whitespace (edn-gen/occasional edn-gen/whitespace-str 30)
-                                        ;:generator/tag (edn-gen/occasional edn-gen/ns-keyword 5)
-                                                   :generator/discard (edn-gen/occasional gen/scalar 5)}))
+  (test-file-of edn-gen/any-hierarchy 10)
+  (test-file-of edn-gen/any-hierarchy 10 {:generator/comment edn-gen/comment-block})
+  (test-file-of edn-gen/any-hierarchy 100 {:generator/comment (edn-gen/occasional edn-gen/comment-block 1 33)
+                                           :generator/whitespace (edn-gen/occasional edn-gen/whitespace-str 3 10)
+                                           ;;:generator/tag (edn-gen/occasional edn-gen/ns-keyword 1 20)
+                                           :generator/discard (edn-gen/occasional gen/scalar 1 20)}))
+
+(defn test-string
+  ([generator n]
+     (test-string generator n {}))
+  ([generator n opts]
+     (doseq [out (edn/many-strings generator n opts)]
+       (let [read-data (read-string (out :out))]
+         (when-not (= read-data
+                      (out :data))
+           (print "test fail on string: " (out :out) ", expected data: " (out :data)))))))
+
+
+(defn test-strings
+  []
+  (test-string gen/int 10)
+  (test-string edn-gen/float 10)
+  (test-string gen/string 10)
+  (test-string gen/keyword 10)
+  (test-string (partial gen/vec gen/int) 10)
+  (test-string (partial gen/vec edn-gen/float) 10)
+  (test-string (partial gen/vec gen/string) 10)
+  (test-string (partial gen/vec gen/keyword) 10)
+  (test-string edn-gen/any-hierarchy 10)
+  (test-string edn-gen/any-hierarchy 10 {:generator/comment edn-gen/comment-block})
+  (test-string edn-gen/any-hierarchy 100 {:generator/comment (edn-gen/occasional edn-gen/comment-block 1 33)
+                                          :generator/whitespace (edn-gen/occasional edn-gen/whitespace-str 3 10)
+                                          ;;:generator/tag (edn-gen/occasional edn-gen/ns-keyword 1 20)
+                                          :generator/discard (edn-gen/occasional gen/scalar 1 20)}))
