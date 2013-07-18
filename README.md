@@ -6,7 +6,7 @@ A Clojure library for creation of edn data.
 
 FIXME
 
-For now, you can see an example of printing edn data to a file in [examples/com/thortech/data/edn/examples/create_files.clj](http://github.com/ThorTech/data.edn/blob/master/examples/com/thortech/data/edn/examples/create_files.clj)
+For now, you can see an example of printing edn data to a file in [examples/com/thortech/data/edn/examples/create_files.clj](https://github.com/edn-format/data.edn/blob/master/examples/com/thortech/data/edn/examples/create_files.clj)
 
 
 ## Releases and dependency information
