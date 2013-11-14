@@ -1,5 +1,5 @@
 {:dev
- {:plugins [[codox "0.6.3"]]
+ {:plugins [[codox "0.6.6"]]
   :codox {:src-dir-uri "http://github.com/edn-format/data.edn/blob/master"
           :src-linenum-anchor-prefix "L"
           :exclude [org.edn-format.data.edn.file-util]}}
