@@ -6,7 +6,7 @@ A Clojure library for creation of edn data.
 
 FIXME
 
-For now, you can see an example of printing edn data to a file in [examples/com/thortech/data/edn/examples/create_files.clj](http://github.com/ThorTech/data.edn/blob/master/examples/com/thortech/data/edn/examples/create_files.clj)
+For now, you can see an example of printing edn data to a file in [examples/org/edn_format/data/edn/examples/create_files.clj](http://github.com/edn-format/data.edn/blob/master/examples/org/edn_format/data/edn/examples/create_files.clj)
 
 
 ## Releases and dependency information
@@ -15,19 +15,19 @@ Latest stable release: 0.1.0
 
 With [Leiningen](http://github.com/technomancy/leiningen), add the following to you `project.clj` file:
 
-    [com.thortech/data.edn "0.1.0"]
+    [org.edn-format/data.edn "0.1.0"]
 
 With [Maven](http://maven.apache.org), add the following to your `pom.xml` file:
 
     <dependency>
-      <groupId>com.thortech</groupId>
+      <groupId>org.edn-format</groupId>
       <artifactId>data.edn</artifactId>
       <version>0.1.0</version>
     </dependency>
 
 ## Reference
 
-[API Documentation](http://thortech.github.com/data.edn)
+[API Documentation](http://edn-format.github.com/data.edn)
 
 ## Rationale
 
