@@ -1,4 +1,4 @@
-(defproject org.edn-format/data.edn "0.1.0-SNAPSHOT"
+(defproject org.edn-format/data.edn "0.1.0"
   :description "A library for creation of edn data."
   :url "http://github.com/edn-format/data.edn"
   :license {:name "Eclipse Public License - v 1.0"
