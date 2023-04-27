@@ -27,7 +27,7 @@ With [Maven](http://maven.apache.org), add the following to your `pom.xml` file:
 
 ## Reference
 
-[API Documentation](http://edn-format.github.com/data.edn)
+[API Documentation](https://edn-format.github.io/data.edn)
 
 ## Rationale
 
